@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\PatientsResource;
 use App\Models\Patient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Illuminate\Validation\Rule;
 
@@ -83,7 +84,7 @@ class PatientController extends Controller
             'cin' => 'nullable|string',
             'category' => 'required|string|max:20',
             'gender' => 'required|string|max:20',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|digits:10',
             'birth_date' => 'nullable|date',
         ]);
 
@@ -135,29 +136,21 @@ class PatientController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Patient $patient)
+    public function update(Request $request, string $patientId)
     {
-        // Validate the incoming request data
-        $validated = $request->validate([
-            'First_Name' => 'required|string|max:255',
-            'Last_Name' => 'required|string|max:255',
-            'Birth_Date' => 'required|date',
-            'Gender' => 'required|in:Male,Female',
-            'CIN' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('patients', 'CIN')->ignore($patient->id),
-            ],
-        ]);
-    
-        // Update the patient record with validated data
-        $patient->update($validated);
-    
-        // Redirect back with a success message
-        return redirect()
-            ->route('Patients.index') // Adjust the route name as per your routes file
-            ->with('success', 'Patient updated successfully.');
+        // Fetch the patient record by ID
+        $patient = Patient::findOrFail($patientId);
+
+        // Update the patient record manually
+        $patient->First_Name = $request->input('First_Name');
+        $patient->Last_Name = $request->input('Last_Name');
+        $patient->Birth_Date = $request->input('Birth_Date');
+        $patient->Gender = $request->input('Gender');
+        $patient->CIN = $request->input('CIN');
+        $patient->save();
+
+        // Return a success response (Inertia redirect)
+        return back()->with('success', 'Patient updated successfully.');
     }
     /**
      * Remove the specified resource from storage.

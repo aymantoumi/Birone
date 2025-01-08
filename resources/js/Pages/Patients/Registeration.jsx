@@ -15,7 +15,7 @@ export default function Registration({ auth, total_count, waiting, done, patient
 
     function submitForm(e) {
         e.preventDefault();
-        post(route('patients.store'));
+        post(route('Patients.store'));
     }
 
 
@@ -94,7 +94,19 @@ export default function Registration({ auth, total_count, waiting, done, patient
                             </div>
                             <div className="flex flex-col">
                                 <label htmlFor="gender" className="dark:text-gray-100 font-extrabold">Gender</label>
-                                <input type="text" name="gender" id="gender" className="max-w-96 rounded-lg" value={data.gender} onChange={e => setData('gender', e.target.value)} />
+                                <select
+                                    name="gender"
+                                    id="gender"
+                                    className="max-w-96 rounded-lg"
+                                    value={data.gender} // Bind the selected value to data.gender
+                                    onChange={(e) => setData("gender", e.target.value)} // Update gender when changed
+                                >
+                                    <option value="" disabled>
+                                        Select Gender
+                                    </option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
                                 {errors.gender && <span className="text-red-500">{errors.gender}</span>}
                             </div>
                             <div className="flex flex-col">

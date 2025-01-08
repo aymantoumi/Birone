@@ -18,7 +18,7 @@ class Patient extends Model
         'birth_date',
         'phone',
         'status',
-    ];
+    ];    
     
     public function actions()
     {
