@@ -11,6 +11,7 @@ Route::redirect('/', '/dashboard');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', fn() => Inertia::render('Dashboard'))->name('dashboard');
     Route::resource('Patients', PatientController::class);
+    Route::post('/patients/{patient}/change-status', [PatientController::class, 'changeStatus'])->name('patients.changeStatus');
     Route::resource('Statistics', StatisticsController::class);
 });
 
