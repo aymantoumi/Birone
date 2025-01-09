@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\action;
+use App\Models\Action;
 use App\Models\Patient;
 use Illuminate\Http\Request;
 
@@ -13,7 +13,7 @@ class ActionController extends Controller
      */
     public function index()
     {
-        //
+        // Implement logic to list actions if needed
     }
 
     /**
@@ -21,7 +21,7 @@ class ActionController extends Controller
      */
     public function create()
     {
-        //
+        // Implement logic to show form for creating a new action if needed
     }
 
     /**
@@ -29,7 +29,6 @@ class ActionController extends Controller
      */
     public function store(Request $request, $patientId)
     {
-
         $validatedData = $request->validate([
             'action' => 'required|string',
             'payment' => 'required|numeric',
@@ -46,39 +45,43 @@ class ActionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(action $action)
+    public function show(Action $action)
     {
-        //
+        // Implement logic to display a specific action if needed
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(action $action)
+    public function edit($actionId)
     {
-        //
+        $action = Action::findOrFail($actionId);
+        return response()->json($action);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $patientId, $actionId)
+    public function update(Request $request, $actionId)
     {
+        logger()->info('Request Data: ', $request->all());
         $validatedData = $request->validate([
-            'Action' => 'required|string',
-            'Payment' => 'required|numeric',
+            'action' => 'required|string',
+            'payment' => 'required|numeric',
         ]);
 
-        $action = Action::where('id', $actionId)->where('Patient_ID', $patientId)->firstOrFail();
+        $action = Action::findOrFail($actionId);
         $action->update($validatedData);
 
-        return redirect()->route('patients.show', $patientId)->with('success', 'Action updated successfully!');
+        return redirect()->back()->with('success', 'Action updated successfully!');
     }
+
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(action $action)
+    public function destroy(Action $action)
     {
-        //
+        $action->delete();
+        return redirect()->back()->with('success', 'Action deleted successfully!');
     }
 }

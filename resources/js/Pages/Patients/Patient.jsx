@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import PatientsLayout from "@/Layouts/PatientsLayout";
 import { Head, useForm } from "@inertiajs/react";
 import Pagination from "../Components/Pagination";
+import Update from './Update'; // Import the Update component
 
 export default function Patient({ auth, patient, actions }) {
     const { data, setData, put, processing, errors } = useForm({
@@ -18,6 +20,8 @@ export default function Patient({ auth, patient, actions }) {
         payment: '',
     });
 
+    const [selectedAction, setSelectedAction] = useState(null);
+
     const handleChange = (field) => (e) => {
         setData(field, e.target.value);
     };
@@ -26,7 +30,6 @@ export default function Patient({ auth, patient, actions }) {
         setActionData(field.toLowerCase(), e.target.value);
     };
 
-
     const submitForm = (e) => {
         e.preventDefault();
         put(route("Patients.update", patient.id));
@@ -34,7 +37,6 @@ export default function Patient({ auth, patient, actions }) {
 
     const submitActionForm = async (e) => {
         e.preventDefault();
-    
         postAction(route('patients.actions.store', { patient: patient.id }), {
             onSuccess: () => {
                 setActionData({
@@ -45,6 +47,13 @@ export default function Patient({ auth, patient, actions }) {
         });
     };
 
+    const handleActionClick = (action) => {
+        setSelectedAction(action);
+    };
+
+    const closeModal = () => {
+        setSelectedAction(null);
+    };
 
     return (
         <PatientsLayout
@@ -121,7 +130,6 @@ export default function Patient({ auth, patient, actions }) {
                                     value={actionData.Action}
                                     onChange={handleActionChange('Action')}
                                 >
-                                    
                                     <option value="visit">Visit</option>
                                     <option value="consultation">Consultation</option>
                                 </select>
@@ -140,7 +148,6 @@ export default function Patient({ auth, patient, actions }) {
                                 {actionErrors.Payment && <span className="text-red-500">{actionErrors.Payment}</span>}
                             </div>
                             <div className="flex justify-evenly">
-
                                 <button type="reset" className="bg-yellow-300 ax-w-fit py-2 px-6 rounded-xl font-extrabold hover:bg-yellow-400 hover:scale-110 transition-all ">
                                     Cancel
                                 </button>
@@ -153,7 +160,7 @@ export default function Patient({ auth, patient, actions }) {
                         {actions.data.map((action, index) => {
                             const formattedDate = new Date(action.created_at).toISOString().split('T')[0];
                             return (
-                                <div key={index} className="flex justify-between text-stone-200 min-w-fit bg-slate-500 py-2 px-4 rounded-md">
+                                <div key={index} className="flex justify-between text-stone-200 min-w-fit bg-slate-500 py-2 px-4 rounded-md" onClick={() => handleActionClick(action)}>
                                     <span>{action.id}</span> <span className="font-extrabold"> {action.action} </span> <span> {formattedDate} </span> 
                                 </div>
                             );
@@ -216,6 +223,11 @@ export default function Patient({ auth, patient, actions }) {
                     </div>
                 </div>
             </section>
+
+            {/* Update Modal */}
+            {selectedAction && (
+                <Update action={selectedAction} onClose={closeModal} />
+            )}
         </PatientsLayout>
-    )
-};
+    );
+}
