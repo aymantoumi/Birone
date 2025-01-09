@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\PatientsResource;
+use App\Models\action;
 use App\Models\Patient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -118,9 +119,11 @@ class PatientController extends Controller
     public function show($patientId)
     {
         $patient = Patient::findOrFail($patientId);
+        $action = action::where('patient_id', $patientId)->orderBy('created_at', 'desc')->paginate(5);
 
         return Inertia::render('Patients/Patient', [
             'patient' => $patient,
+            'actions' => $action, 
         ]);
     }
 
@@ -147,6 +150,7 @@ class PatientController extends Controller
         $patient->Birth_Date = $request->input('Birth_Date');
         $patient->Gender = $request->input('Gender');
         $patient->CIN = $request->input('CIN');
+        $patient->Phone = $request->input('Phone'); // Add this line
         $patient->save();
 
         // Return a success response (Inertia redirect)
