@@ -2,7 +2,7 @@ import { useState } from 'react';
 import PatientsLayout from "@/Layouts/PatientsLayout";
 import { Head, useForm } from "@inertiajs/react";
 import Pagination from "../Components/Pagination";
-import Update from './Update'; 
+import Update from './Update';
 
 export default function Patient({ auth, patient, actions }) {
     const { data, setData, put, processing, errors } = useForm({
@@ -130,6 +130,7 @@ export default function Patient({ auth, patient, actions }) {
                                     value={actionData.Action}
                                     onChange={handleActionChange('Action')}
                                 >
+                                    <option value="" disabled>Select visit type</option>
                                     <option value="visit">Visit</option>
                                     <option value="consultation">Consultation</option>
                                 </select>
@@ -161,11 +162,11 @@ export default function Patient({ auth, patient, actions }) {
                             const formattedDate = new Date(action.created_at).toISOString().split('T')[0];
                             return (
                                 <div key={index} className="flex justify-between min-w-fit bg-emerald-200 py-2 px-4 rounded-md" onClick={() => handleActionClick(action)}>
-                                    <span>{action.id}</span> <span className="font-extrabold"> {action.action} </span> <span> {formattedDate} </span> 
+                                    <span>{action.id}</span> <span className="font-extrabold"> {action.action} </span> <span> {formattedDate} </span>
                                 </div>
                             );
                         })}
-                        <Pagination links={actions.links}/>
+                        <Pagination links={actions.links} />
                     </div>
                 </div>
                 <div className="dark:bg-gray-800 bg-sky-100 py-8 px-24 rounded-lg grid  lg:grid-cols-2 grid-cols-1 gap-4">
