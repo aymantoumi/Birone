@@ -26,25 +26,25 @@ export default function Registration({ auth, total_count, waiting, done, patient
         >
             <Head title="Add Patients" />
             <section className="py-16 px-32">
-                <div className="dark:bg-gray-800 py-4 px-16 rounded-2xl">
+                <div className="dark:bg-gray-800 bg-sky-500 py-4 px-16 rounded-2xl hover:shadow-2xl transition-all duration-300 shadow-sky-200">
                     <h1 className="font-extrabold text-3xl dark:text-gray-100 text-gray-900">Add new Patient</h1>
-                    <div className="grid sm:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
+                    <div className="grid sm:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 ">
                         <div className="flex flex-wrap gap-2 justify-center items-start p-4 sm:col-span-1 lg:col-span-2">
-                            <div className="bg-cadetblue min-w-[8em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-stone-400 max-h-fit flex flex-col">
+                            <div className="min-w-[8em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-stone-400 bg-sky-200 max-h-fit flex flex-col">
                                 <div className="flex gap-2 dark:text-black font-extrabold text-xl">
                                     <span>Total</span>
                                     <i className="fa-solid fa-user"></i>
                                 </div>
                                 <span className="font-extrabold text-lg">{total_count}</span>
                             </div>
-                            <div className="bg-cadetblue min-w-[8em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-stone-400 max-h-fit flex flex-col">
+                            <div className="bg-cadetblue min-w-[8em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-stone-400 bg-yellow-200 max-h-fit flex flex-col">
                                 <div className="flex gap-2 dark:text-black font-extrabold text-xl">
                                     <span>Waiting</span>
                                     <i className="fa-regular fa-clock"></i>
                                 </div>
                                 <span className="font-extrabold text-lg">{waiting}</span>
                             </div>
-                            <div className="bg-cadetblue min-w-[8em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-stone-400 max-h-fit flex flex-col">
+                            <div className="bg-cadetblue min-w-[8em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-stone-400 bg-emerald-200 max-h-fit flex flex-col">
                                 <div className="flex gap-2 dark:text-black font-extrabold text-xl">
                                     <span>Complete</span>
                                     <i className="fa-solid fa-check-double"></i>
@@ -52,10 +52,10 @@ export default function Registration({ auth, total_count, waiting, done, patient
                                 <span className="font-extrabold text-lg">{done}</span>
                             </div>
                         </div>
-                        <div className="gap-3 px-3 py-2 min-h-32 dark:bg-gray-700 rounded-3xl flex flex-col 2xl:row-span-2 sm:col-span-1">
+                        <div className="gap-3 px-3 py-2 min-h-32 bg-yellow-100 dark:bg-gray-700 rounded-xl flex flex-col 2xl:row-span-2 sm:col-span-1">
                             {patientsWaiting.data.map((patient, index) => (
                                 <div key={patient.id}
-                                    className="bg-stone-300 py-3 px-5 font-semibold flex justify-between rounded-lg"
+                                    className="bg-sky-200 py-3 px-5 font-semibold flex justify-between rounded-lg"
                                 >
                                     <div>
                                         {patient.First_Name} {patient.Last_Name}
@@ -98,8 +98,8 @@ export default function Registration({ auth, total_count, waiting, done, patient
                                     name="gender"
                                     id="gender"
                                     className="max-w-96 rounded-lg"
-                                    value={data.gender} // Bind the selected value to data.gender
-                                    onChange={(e) => setData("gender", e.target.value)} // Update gender when changed
+                                    value={data.gender} 
+                                    onChange={(e) => setData("gender", e.target.value)} 
                                 >
                                     <option value="" disabled>
                                         Select Gender
@@ -123,7 +123,7 @@ export default function Registration({ auth, total_count, waiting, done, patient
                                 <button type="reset" className="bg-yellow-300 ax-w-fit py-2 px-6 rounded-xl font-extrabold hover:bg-yellow-400 hover:scale-110 transition-all ">
                                     Cancel
                                 </button>
-                                <button type="submit" className="dark:bg-green-400 dark:text-green-950 max-w-fit py-2 px-6 rounded-xl font-extrabold hover:bg-green-700 hover:scale-110 bg-green-900 text-green-200 transition-all" disabled={processing}>
+                                <button type="submit" className="dark:bg-green-400 dark:text-green-950 max-w-fit py-2 px-6 rounded-xl font-extrabold hover:bg-green-700 hover:scale-110 bg-emerald-500 transition-all" disabled={processing}>
                                     Add
                                 </button>
                             </div>

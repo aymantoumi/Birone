@@ -33,16 +33,16 @@ export default function Index({ auth, patients, queryParams = {} }) {
     return (
         <PatientsLayout
             user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Patients Management</h2>}
+            header={<h2 className="font-semibold text-xl dark:text-gray-200 leading-tight">Patients Management</h2>}
         >
             <Head title="Patients" />
 
             <div className="py-12 max-h-screen flex flex-col items-center mx-12">
-                <div className=" bg-white dark:bg-gray-800 min-w-full overflow-hidden shadow-sm sm:rounded-lg">
+                <div className=" bg-slate-200 dark:bg-gray-800 shadow-lg shadow-sky-200 min-w-full overflow-hidden hover:shadow-2xl transition-all duration-300">
                     <div className="py-8 px-20 flex flex-col">
                         <table className="rounded-lg overflow-hidden">
-                            <thead className="dark:bg-stone-900">
-                                <tr className="font-extrabold text-xl text-stone-200">
+                            <thead className="dark:bg-stone-900 bg-sky-600">
+                                <tr className="font-extrabold text-xl dark:text-stone-200">
                                     <th className="py-2">ID</th>
                                     <th className="py-2">CIN</th>
                                     <th className="py-2">Full Name</th>
@@ -51,7 +51,7 @@ export default function Index({ auth, patients, queryParams = {} }) {
                                     <th className="py-2">Birthdate</th>
                                 </tr>
                             </thead>
-                            <thead className="dark:bg-stone-700">
+                            <thead className="dark:bg-stone-700 bg-sky-400">
                                 <tr className="font-extrabold text-xl">
                                     <th className="py-2"></th>
                                     <th className="py-2">
@@ -101,8 +101,8 @@ export default function Index({ auth, patients, queryParams = {} }) {
                                 {patients.data.map((patient, index) => (
                                     <tr
                                         key={patient.id}
-                                        className={`text-center ${index % 2 === 0 ? 'bg-stone-200' : 'bg-slate-300'
-                                            } hover:bg-sky-200 hover:font-semibold transition duration-300`}
+                                        className={`text-center ${index % 2 === 0 ? 'dark:bg-stone-200 bg-sky-100' : 'dark:bg-slate-300 bg-sky-300'
+                                            } hover:bg-sky-200 transition duration-300`}
                                     >
                                         <td className="px-4 py-2 border-b border-gray-200 font-semibold">
                                             <Link href={route("Patients.show", patient.id)} className="text-blue-600 hover:underline">

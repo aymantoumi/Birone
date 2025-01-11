@@ -5,7 +5,7 @@ export default function PatientsLayout({ children, user, header }) {
     return (
         <Authenticated user={user} header={header}>
             <section className='py-16 '>
-                <div className="dark:bg-gray-800 space-x-8 sm:-my-px sm:ml-10 sm:flex max-w-fit py-2 px-6 rounded-2xl ">
+                <div className="dark:bg-gray-800 bg-sky-700 space-x-8 sm:-my-px sm:ml-10 sm:flex max-w-fit py-2 px-6 rounded-2xl ">
                     <NavLink href={route('Patients.index')} active={route().current('Patients.index')}>
                         Patients
                     </NavLink>
