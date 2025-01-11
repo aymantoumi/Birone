@@ -33,13 +33,16 @@ class ActionController extends Controller
             'action' => 'required|string',
             'payment' => 'required|numeric',
         ]);
-        logger()->info('Validated Data: ', $validatedData);
 
         $validatedData['patient_id'] = $patientId;
 
         $action = Action::create($validatedData);
 
-        return redirect()->back()->with('success', 'Action added successfully!');
+        $patient = Patient::findOrFail($patientId);
+        $patient->status = false; 
+        $patient->save();
+
+        return to_route('Patients.create');
     }
 
     /**
