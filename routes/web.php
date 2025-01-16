@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActionController;
+use App\Http\Controllers\ActionsTypeController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StatisticsController;
@@ -15,6 +16,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('patients.actions', ActionController::class)->shallow();
     Route::post('/patients/{patient}/change-status', [PatientController::class, 'changeStatus'])->name('patients.changeStatus');
     Route::resource('Statistics', StatisticsController::class);
+    Route::resource('settings', ActionsTypeController::class);
 });
 
 Route::middleware('auth')->group(function () {

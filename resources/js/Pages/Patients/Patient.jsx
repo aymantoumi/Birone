@@ -153,7 +153,7 @@ export default function Patient({ auth, patient, actions }) {
                                     Cancel
                                 </button>
                                 <button type="submit" className="dark:bg-emerald-400 dark:text-green-950 max-w-fit py-2 px-6 rounded-xl font-extrabold hover:bg-green-700 hover:scale-110 bg-emerald-400  transition-all" disabled={processing}>
-                                    Add
+                                {processing ? "Adding..." : "Add"}
                                 </button>
                             </div>
                         </form>
