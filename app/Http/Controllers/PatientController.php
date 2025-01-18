@@ -52,33 +52,33 @@ class PatientController extends Controller
     public function create()
     {
         $today = date('Y-m-d');
-    
+
         // Count all patients
         $patientsCount = Patient::count();
-    
+
         // Get actions where Status is false (waiting) and join with patient data
         $actionsWaiting = Action::whereDate('created_at', $today)
             ->where('Status', false)
             ->with('patient') // Assuming a relationship exists in the Action model
             ->orderBy('created_at', 'desc')
             ->paginate(6);
-    
+
         // Count waiting and done actions for today
         $waiting = Action::whereDate('created_at', $today)
             ->where('Status', false)
             ->count();
-    
+
         $done = Action::whereDate('created_at', $today)
             ->where('Status', true)
             ->count();
-    
+
         return inertia('Patients/Registeration', [
             'total_count' => $patientsCount,
             'waiting' => $waiting,
             'done' => $done,
             'actionsWaiting' => $actionsWaiting,
         ]);
-    }    
+    }
 
 
     /**
@@ -95,13 +95,13 @@ class PatientController extends Controller
             'phone' => 'nullable|digits:10',
             'birth_date' => 'nullable|date',
         ]);
+        $validatedData['created_by'] = auth()->id();
 
         $patient = new Patient($validatedData);
         $patient->save();
 
         return to_route('Patients.index');
     }
-
     /**
      * Display the specified resource.
      */
@@ -112,7 +112,7 @@ class PatientController extends Controller
 
         return Inertia::render('Patients/Patient', [
             'patient' => $patient,
-            'actions' => $action, 
+            'actions' => $action,
         ]);
     }
 
@@ -130,19 +130,27 @@ class PatientController extends Controller
      */
     public function update(Request $request, string $patientId)
     {
-        // Fetch the patient record by ID
+        $validatedData = $request->validate([
+            'First_Name' => 'required|string|max:20',
+            'Last_Name' => 'required|string|max:20',
+            'CIN' => 'nullable|string',
+            'Birth_Date' => 'nullable|date',
+            'Gender' => 'required|string|max:20',
+            'Phone' => 'nullable|digits:10',
+        ]);
+    
         $patient = Patient::findOrFail($patientId);
-
-        // Update the patient record manually
-        $patient->First_Name = $request->input('First_Name');
-        $patient->Last_Name = $request->input('Last_Name');
-        $patient->Birth_Date = $request->input('Birth_Date');
-        $patient->Gender = $request->input('Gender');
-        $patient->CIN = $request->input('CIN');
-        $patient->Phone = $request->input('Phone'); // Add this line
+    
+        $patient->First_Name = $validatedData['First_Name'];
+        $patient->Last_Name = $validatedData['Last_Name'];
+        $patient->Birth_Date = $validatedData['Birth_Date'];
+        $patient->Gender = $validatedData['Gender'];
+        $patient->CIN = $validatedData['CIN'];
+        $patient->Phone = $validatedData['Phone'];
+        $patient->updated_by = auth()->id();  
+    
         $patient->save();
-
-        // Return a success response (Inertia redirect)
+    
         return back()->with('success', 'Patient updated successfully.');
     }
     /**
