@@ -2,7 +2,7 @@ import PatientsLayout from "@/Layouts/PatientsLayout";
 import { Head, useForm } from "@inertiajs/react";
 import Pagination from "../Components/Pagination";
 
-export default function Registration({ auth, total_count, waiting, done, patientsWaiting }) {
+export default function Registration({ auth, total_count, waiting, done, actionsWaiting }) {
     const { data, setData, post, processing, errors } = useForm({
         first_name: '',
         last_name: '',
@@ -17,7 +17,6 @@ export default function Registration({ auth, total_count, waiting, done, patient
         e.preventDefault();
         post(route('Patients.store'));
     }
-
 
     return (
         <PatientsLayout
@@ -53,15 +52,15 @@ export default function Registration({ auth, total_count, waiting, done, patient
                             </div>
                         </div>
                         <div className="gap-3 px-3 py-2 min-h-32 bg-yellow-100 dark:bg-gray-700 rounded-xl flex flex-col 2xl:row-span-2 sm:col-span-1">
-                            {patientsWaiting.data.map((patient, index) => (
-                                <div key={patient.id}
+                            {actionsWaiting.data.map((action, index) => (
+                                <div key={action.id}
                                     className="bg-sky-200 py-3 px-5 font-semibold flex justify-between rounded-lg"
                                 >
                                     <div>
-                                        {patient.First_Name} {patient.Last_Name}
+                                        {action.patient.First_Name} {action.patient.Last_Name} - {action.action}
                                     </div>
                                     <div className="bg-green-400 py-1 px-4 rounded-md">
-                                        <form action={route('patients.changeStatus', { patient: patient.id })} method="post">
+                                        <form action={route('action.changeStatus', { patient: action.patient.id })} method="post">
                                             <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]').getAttribute("content")} />
                                             <input type="hidden" name="status" value="1" />
                                             <button type="submit">Done</button>
@@ -69,7 +68,7 @@ export default function Registration({ auth, total_count, waiting, done, patient
                                     </div>
                                 </div>
                             ))}
-                            <Pagination links={patientsWaiting.links} />
+                            <Pagination links={actionsWaiting.links} />
                         </div>
                         <form onSubmit={submitForm} className="grid sm:grid-cols-1 2xl:grid-cols-2 gap-4 py-4 sm:col-span-1 lg:col-span-1 2xl:col-span-2">
                             <div className="flex flex-col">

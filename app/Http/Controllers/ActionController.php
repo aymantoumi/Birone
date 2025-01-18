@@ -33,15 +33,18 @@ class ActionController extends Controller
             'action' => 'required|string',
             'payment' => 'required|numeric',
         ]);
-
+    
         $validatedData['patient_id'] = $patientId;
-
+    
         $action = Action::create($validatedData);
-
+    
         $patient = Patient::findOrFail($patientId);
-        $patient->status = false; 
-        $patient->save();
-
+    
+        if ($patient->status) { 
+            $patient->status = false;
+            $patient->save();
+        }
+    
         return to_route('Patients.create');
     }
 
@@ -62,6 +65,23 @@ class ActionController extends Controller
         return response()->json($action);
     }
 
+    /**
+     * 
+     * switch the status of a patient
+     * 
+     */
+    public function changeStatus(Request $request, $actionId)
+    {
+        $validated = $request->validate([
+            'status' => 'required|boolean',
+        ]);
+        
+        $patient = Action::findOrFail($actionId);
+        $patient->status = $validated['status'];
+        $patient->save();
+
+        return back()->with('success', 'Patient status updated successfully!');
+    }
     /**
      * Update the specified resource in storage.
      */
