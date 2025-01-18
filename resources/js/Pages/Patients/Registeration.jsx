@@ -60,7 +60,7 @@ export default function Registration({ auth, total_count, waiting, done, actions
                                         {action.patient.First_Name} {action.patient.Last_Name} - {action.action}
                                     </div>
                                     <div className="bg-green-400 py-1 px-4 rounded-md">
-                                        <form action={route('action.changeStatus', { patient: action.patient.id })} method="post">
+                                        <form action={route('action.changeStatus', { patient: action.id })} method="post">
                                             <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]').getAttribute("content")} />
                                             <input type="hidden" name="status" value="1" />
                                             <button type="submit">Done</button>
@@ -97,8 +97,8 @@ export default function Registration({ auth, total_count, waiting, done, actions
                                     name="gender"
                                     id="gender"
                                     className="max-w-96 rounded-lg"
-                                    value={data.gender} 
-                                    onChange={(e) => setData("gender", e.target.value)} 
+                                    value={data.gender}
+                                    onChange={(e) => setData("gender", e.target.value)}
                                 >
                                     <option value="" disabled>
                                         Select Gender

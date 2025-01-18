@@ -75,13 +75,14 @@ class ActionController extends Controller
         $validated = $request->validate([
             'status' => 'required|boolean',
         ]);
-        
-        $patient = Action::findOrFail($actionId);
-        $patient->status = $validated['status'];
-        $patient->save();
 
+        $patient = Action::findOrFail($actionId);
+        $patient->Status = $validated['status']; 
+    
+        $patient->save();
+    
         return back()->with('success', 'Patient status updated successfully!');
-    }
+    }    
     /**
      * Update the specified resource in storage.
      */
