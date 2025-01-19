@@ -11,8 +11,13 @@ class action extends Model
 
     protected $table = 'actions'; 
 
-    protected $fillable = ['patient_id', 'action', 'payment', 'Status'];
+    protected $fillable = ['patient_id', 'action', 'payment', 'Status', 'created_by', 'updated_by'];
 
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 
     public function patient()
     {

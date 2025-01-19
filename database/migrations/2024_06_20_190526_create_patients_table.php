@@ -13,17 +13,18 @@ return new class extends Migration
     {
         Schema::create('patients', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('First_Name', 20);
-            $table->string('Last_Name', 20);
+            $table->string('First_Name', 50);  
+            $table->string('Last_Name', 50);   
             $table->string('CIN')->nullable();
-            $table->string('Category', 20);
+            $table->string('Category', 50);    
             $table->dateTime('Birth_Date')->nullable();
             $table->string('Gender', 20);
             $table->string('Phone', 20)->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users', 'id')->onDelete('set null')->onUpdate('cascade');
+            $table->foreignId('updated_by')->nullable()->constrained('users', 'id')->onDelete('set null')->onUpdate('cascade');
             $table->timestamps();
         });
     }
-
     /**
      * Reverse the migrations.
      */

@@ -33,20 +33,27 @@ class ActionController extends Controller
             'action' => 'required|string',
             'payment' => 'required|numeric',
         ]);
-    
+
+        // Add the user ID to the validated data
         $validatedData['patient_id'] = $patientId;
-    
+        $validatedData['created_by'] = auth()->id(); 
+        $validatedData['updated_by'] = auth()->id(); 
+
+        // Create the action
         $action = Action::create($validatedData);
-    
+
+        // Find the patient and update the status if necessary
         $patient = Patient::findOrFail($patientId);
-    
-        if ($patient->status) { 
+
+        if ($patient->status) {
             $patient->status = false;
             $patient->save();
         }
-    
+
+        // Redirect to the Patients creation route
         return to_route('Patients.create');
     }
+
 
     /**
      * Display the specified resource.
@@ -77,28 +84,33 @@ class ActionController extends Controller
         ]);
 
         $patient = Action::findOrFail($actionId);
-        $patient->Status = $validated['status']; 
-    
+        $patient->Status = $validated['status'];
+        $validatedData['updated_by'] = auth()->id(); 
+
         $patient->save();
-    
+
         return back()->with('success', 'Patient status updated successfully!');
-    }    
+    }
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, $actionId)
     {
         logger()->info('Request Data: ', $request->all());
+    
         $validatedData = $request->validate([
             'action' => 'required|string',
             'payment' => 'required|numeric',
         ]);
-
+    
+        $validatedData['updated_by'] = auth()->id(); 
+    
         $action = Action::findOrFail($actionId);
         $action->update($validatedData);
-
+    
         return redirect()->back()->with('success', 'Action updated successfully!');
     }
+    
 
     /**
      * Remove the specified resource from storage.
