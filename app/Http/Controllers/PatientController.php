@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\PatientsResource;
 use App\Models\action;
+use App\Models\ActionsType;
 use App\Models\Patient;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -52,26 +53,24 @@ class PatientController extends Controller
     public function create()
     {
         $today = date('Y-m-d');
-
-        // Count all patients
-        $patientsCount = Patient::count();
-
-        // Get actions where Status is false (waiting) and join with patient data
+    
+        // Check actions for today
         $actionsWaiting = Action::whereDate('created_at', $today)
-            ->where('Status', false)
-            ->with('patient') // Assuming a relationship exists in the Action model
-            ->orderBy('created_at', 'desc')
+            ->with(['patient', 'actionType']) // Using the correct relationship
             ->paginate(6);
-
-        // Count waiting and done actions for today
+    
+        // Debugging: check if there are any actions for today
+        // dd($actionsWaiting);
+    
+        // Other statistics
+        $patientsCount = Patient::count();
         $waiting = Action::whereDate('created_at', $today)
             ->where('Status', false)
             ->count();
-
         $done = Action::whereDate('created_at', $today)
             ->where('Status', true)
             ->count();
-
+    
         return inertia('Patients/Registeration', [
             'total_count' => $patientsCount,
             'waiting' => $waiting,
@@ -79,6 +78,7 @@ class PatientController extends Controller
             'actionsWaiting' => $actionsWaiting,
         ]);
     }
+          
 
 
     /**
@@ -108,14 +108,15 @@ class PatientController extends Controller
     public function show($patientId)
     {
         $patient = Patient::findOrFail($patientId);
+        $actions = ActionsType::all(); 
         $action = action::where('patient_id', $patientId)->orderBy('created_at', 'desc')->paginate(5);
-
+    
         return Inertia::render('Patients/Patient', [
             'patient' => $patient,
             'actions' => $action,
+            'actionsTypes' => $actions,
         ]);
     }
-
 
     /**
      * Show the form for editing the specified resource.

@@ -53,15 +53,17 @@ export default function Registration({ auth, total_count, waiting, done, actions
                         </div>
                         <div className="gap-3 px-3 py-2 min-h-32 bg-yellow-100 dark:bg-gray-700 rounded-xl flex flex-col 2xl:row-span-2 sm:col-span-1">
                             {actionsWaiting.data.map((action, index) => (
-                                <div key={action.id}
-                                    className="bg-sky-200 py-3 px-5 font-semibold flex justify-between rounded-lg"
-                                >
+                                <div key={action.id} className="bg-sky-200 py-3 px-5 font-semibold flex justify-between rounded-lg">
                                     <div>
-                                        {action.patient.First_Name} {action.patient.Last_Name} - {action.action}
+                                        {action.actionTy ? `${action.patient.First_Name} ${action.patient.Last_Name}` : "Patient Not Found"} - {action.actionType?.action}
                                     </div>
                                     <div className="bg-green-400 py-1 px-4 rounded-md">
                                         <form action={route('action.changeStatus', { patient: action.id })} method="post">
-                                            <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]').getAttribute("content")} />
+                                            <input
+                                                type="hidden"
+                                                name="_token"
+                                                value={document.querySelector('meta[name="csrf-token"]').getAttribute('content')}
+                                            />
                                             <input type="hidden" name="status" value="1" />
                                             <button type="submit">Done</button>
                                         </form>
