@@ -15,7 +15,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', fn() => Inertia::render('Dashboard'))->name('dashboard');
     Route::resource('Patients', PatientController::class);
     Route::resource('patients.actions', ActionController::class)->shallow();
-    Route::post('/patients/{patient}/change-status', [PatientController::class, 'changeStatus'])->name('patients.changeStatus');
+    Route::post('/patients/{patient}/change-status', [ActionController::class, 'changeStatus'])->name('action.changeStatus');
     Route::resource('Statistics', StatisticsController::class);
     Route::resource('actionType', ActionsTypeController::class);
     Route::get('/settings', [Settings::class, 'index'])->name('settings.index');

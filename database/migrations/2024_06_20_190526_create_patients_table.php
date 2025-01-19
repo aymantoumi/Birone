@@ -20,7 +20,6 @@ return new class extends Migration
             $table->dateTime('Birth_Date')->nullable();
             $table->string('Gender', 20);
             $table->string('Phone', 20)->nullable();
-            $table->boolean('Status')->default(false);
             $table->timestamps();
         });
     }

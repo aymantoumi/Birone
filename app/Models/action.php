@@ -11,7 +11,7 @@ class action extends Model
 
     protected $table = 'actions'; 
 
-    protected $fillable = ['patient_id', 'action', 'payment'];
+    protected $fillable = ['patient_id', 'action', 'payment', 'Status'];
 
 
     public function patient()

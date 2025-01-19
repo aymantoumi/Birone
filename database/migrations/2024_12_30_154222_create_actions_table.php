@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('patient_id')->constrained('patients', 'id');
             $table->string('action', 50);
             $table->decimal('payment', 8, 2)->default(0);
+            $table->boolean('Status')->default(false);
             $table->timestamps();
         });
     }
