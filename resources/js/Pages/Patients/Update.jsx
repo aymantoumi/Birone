@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import Modal from '@/Components/Modal'; 
 import { useForm } from '@inertiajs/react';
-import axios from 'axios';
 
 export default function Update({ action, onClose }) {
     const { data, setData, put, delete: destroy, processing, errors } = useForm({

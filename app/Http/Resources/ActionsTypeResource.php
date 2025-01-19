@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ActionResource extends JsonResource
+class ActionsTypeResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,11 +16,7 @@ class ActionResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'patient_id' => $this->Patient_ID,
-            'action' => $this->Action,
-            'payment' => $this->Payment,
-            'created_by' => $this->created_by,
-            'updated_by' => $this->updated_by,
+            'action' => $this->action,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
