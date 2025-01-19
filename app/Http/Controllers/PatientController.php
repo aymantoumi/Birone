@@ -6,9 +6,7 @@ use App\Http\Resources\PatientsResource;
 use App\Models\action;
 use App\Models\Patient;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
-use Illuminate\Validation\Rule;
 
 class PatientController extends Controller
 {
@@ -54,24 +52,33 @@ class PatientController extends Controller
     public function create()
     {
         $today = date('Y-m-d');
-
+    
+        // Count all patients
         $patientsCount = Patient::count();
-        $patientsWaiting = Patient::whereDate('created_at', $today)
+    
+        // Get actions where Status is false (waiting) and join with patient data
+        $actionsWaiting = Action::whereDate('created_at', $today)
+            ->where('Status', false)
+            ->with('patient') // Assuming a relationship exists in the Action model
             ->orderBy('created_at', 'desc')
-            ->where('status', 0)
             ->paginate(6);
-        $waiting = Patient::whereDate('created_at', $today)
-            ->where('status', 0)
+    
+        // Count waiting and done actions for today
+        $waiting = Action::whereDate('created_at', $today)
+            ->where('Status', false)
             ->count();
-        $done = Patient::whereDate('created_at', $today)->where('status', 1)->count();
-
+    
+        $done = Action::whereDate('created_at', $today)
+            ->where('Status', true)
+            ->count();
+    
         return inertia('Patients/Registeration', [
             'total_count' => $patientsCount,
             'waiting' => $waiting,
             'done' => $done,
-            'patientsWaiting' => $patientsWaiting,
+            'actionsWaiting' => $actionsWaiting,
         ]);
-    }
+    }    
 
 
     /**
@@ -93,24 +100,6 @@ class PatientController extends Controller
         $patient->save();
 
         return to_route('Patients.index');
-    }
-
-    /**
-     * 
-     * switch the status of a patient
-     * 
-     */
-    public function changeStatus(Request $request, $patientId)
-    {
-        $validated = $request->validate([
-            'status' => 'required|boolean',
-        ]);
-
-        $patient = Patient::findOrFail($patientId);
-        $patient->status = $validated['status'];
-        $patient->save();
-
-        return back()->with('success', 'Patient status updated successfully!');
     }
 
     /**
