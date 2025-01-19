@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('actions_types', function (Blueprint $table) {
             $table->id();
+            $table->string('action');
             $table->timestamps();
         });
     }

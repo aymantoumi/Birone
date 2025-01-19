@@ -28,9 +28,14 @@ class ActionsTypeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'action' => 'required|string|min:5|max:30',
+        ]);
+    
+        ActionsType::create($validatedData);
+    
+        return to_route('settings.index');
     }
-
     /**
      * Display the specified resource.
      */
@@ -50,10 +55,17 @@ class ActionsTypeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, ActionsType $actionsType)
+    public function update(Request $request, $id)
     {
-        //
-    }
+        $validatedData = $request->validate([
+            'action' => 'required|string|min:5|max:30',
+        ]);
+    
+        $actionType = ActionsType::findOrFail($id);
+        $actionType->update($validatedData);
+    
+        return back()->with('success', 'Action updated successfully!');
+    }    
 
     /**
      * Remove the specified resource from storage.
