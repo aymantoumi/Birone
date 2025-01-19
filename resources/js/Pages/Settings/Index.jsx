@@ -1,9 +1,21 @@
+import { useState } from 'react';
 import Settings from "@/Layouts/SettingsLayout";
 import { Head } from "@inertiajs/react";
 import ActionsForm from "./SettingsComponents/Actions";
 import Pagination from "../Components/Pagination";
+import ActionUpdateDeleteModal from './SettingsComponents/ActionUpdateDelete';
 
 export default function Index({ auth, actionsType }) {
+    const [selectedAction, setSelectedAction] = useState(null);
+
+    const handleActionClick = (action) => {
+        setSelectedAction(action);
+    };
+
+    const closeModal = () => {
+        setSelectedAction(null);
+    };
+
     return (
         <Settings
             user={auth.user}
@@ -23,16 +35,14 @@ export default function Index({ auth, actionsType }) {
                                 actionsType.data.map((action) => (
                                     <div
                                         key={action.id}
-                                        className="bg-white p-4 mb-2 rounded-lg shadow-sm"
+                                        className="bg-white p-4 mb-2 rounded-lg shadow-sm cursor-pointer"
+                                        onClick={() => handleActionClick(action)}
                                     >
                                         <div>
                                             <h3 className="font-bold text-lg text-gray-800">{action.action}</h3>
                                             <p className="text-sm text-gray-500">
                                                 Created At: {new Date(action.created_at).toLocaleString()}
                                             </p>
-                                            <div>
-                                                
-                                            </div>
                                         </div>
                                     </div>
                                 ))
@@ -52,6 +62,11 @@ export default function Index({ auth, actionsType }) {
                     <h1 className="dark:text-amber-950 text-2xl font-extrabold">Medication Class</h1>
                 </div>
             </section>
+
+            {/* Update/Delete Modal */}
+            {selectedAction && (
+                <ActionUpdateDeleteModal action={selectedAction} onClose={closeModal} />
+            )}
         </Settings>
     );
 }

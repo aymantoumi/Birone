@@ -12,7 +12,7 @@ class ActionsTypeController extends Controller
      */
     public function index()
     {
-        return inertia('Settings/Index');
+        // Implement logic to list action types if needed
     }
 
     /**
@@ -20,7 +20,7 @@ class ActionsTypeController extends Controller
      */
     public function create()
     {
-        //
+        // Implement logic to show form for creating a new action type if needed
     }
 
     /**
@@ -31,17 +31,18 @@ class ActionsTypeController extends Controller
         $validatedData = $request->validate([
             'action' => 'required|string|min:5|max:30',
         ]);
-    
+
         ActionsType::create($validatedData);
-    
+
         return to_route('settings.index');
     }
+
     /**
      * Display the specified resource.
      */
     public function show(ActionsType $actionsType)
     {
-        //
+        // Implement logic to display a specific action type if needed
     }
 
     /**
@@ -49,7 +50,7 @@ class ActionsTypeController extends Controller
      */
     public function edit(ActionsType $actionsType)
     {
-        //
+        // Implement logic to show form for editing a specific action type if needed
     }
 
     /**
@@ -60,18 +61,25 @@ class ActionsTypeController extends Controller
         $validatedData = $request->validate([
             'action' => 'required|string|min:5|max:30',
         ]);
-    
+
         $actionType = ActionsType::findOrFail($id);
         $actionType->update($validatedData);
-    
+
         return back()->with('success', 'Action updated successfully!');
-    }    
+    }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ActionsType $actionsType)
+    public function destroy($id)
     {
-        //
-    }
+        $actionsType = ActionsType::find($id);
+    
+        if ($actionsType) {
+            $actionsType->delete();
+            return back()->with('success', 'Action type deleted successfully!');
+        } else {
+            return back()->with('error', 'Action type not found.');
+        }
+    }    
 }
