@@ -55,7 +55,7 @@ export default function Registration({ auth, total_count, waiting, done, actions
                             {actionsWaiting.data.map((action, index) => (
                                 <div key={action.id} className="bg-sky-200 py-3 px-5 font-semibold flex justify-between rounded-lg">
                                     <div>
-                                        {action.actionTy ? `${action.patient.First_Name} ${action.patient.Last_Name}` : "Patient Not Found"} - {action.actionType?.action}
+                                        {action.patient ? `${action.patient.first_name} ${action.patient.last_name}` : "Patient Not Found"} - {action.actionType?.action}
                                     </div>
                                     <div className="bg-green-400 py-1 px-4 rounded-md">
                                         <form action={route('action.changeStatus', { patient: action.id })} method="post">
@@ -70,7 +70,7 @@ export default function Registration({ auth, total_count, waiting, done, actions
                                     </div>
                                 </div>
                             ))}
-                            <Pagination links={actionsWaiting.links} />
+                            <Pagination links={actionsWaiting.meta.links} />
                         </div>
                         <form onSubmit={submitForm} className="grid sm:grid-cols-1 2xl:grid-cols-2 gap-4 py-4 sm:col-span-1 lg:col-span-1 2xl:col-span-2">
                             <div className="flex flex-col">

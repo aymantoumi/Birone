@@ -169,7 +169,7 @@ export default function Patient({ auth, patient, actions, actionsTypes }) {
                             const formattedDate = new Date(action.created_at).toISOString().split('T')[0];
                             return (
                                 <div key={index} className="flex justify-between min-w-fit bg-emerald-200 py-2 px-4 rounded-md" onClick={() => handleActionClick(action)}>
-                                    <span>{action.id}</span> <span className="font-extrabold"> {action.action} </span> <span> {formattedDate} </span>
+                                    <span>{action.id}</span> <span className="font-extrabold"> {action.actionType?.action} </span> <span> {formattedDate} </span>
                                 </div>
                             );
                         })}

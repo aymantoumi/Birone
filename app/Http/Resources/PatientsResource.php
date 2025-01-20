@@ -20,7 +20,7 @@ class PatientsResource extends JsonResource
             'last_name' => $this->Last_Name,
             'cin' => $this->CIN,
             'category' => $this->Category,
-            'birth_date' => $this->Birth_Date ? $this->Birth_Date->format('Y-m-d') : null,
+            'birth_date' => $this->Birth_Date,
             'gender' => $this->Gender,
             'phone' => $this->Phone,
             'status' => $this->Status,

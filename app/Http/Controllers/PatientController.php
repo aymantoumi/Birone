@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ActionResource;
 use App\Http\Resources\PatientsResource;
 use App\Models\action;
 use App\Models\ActionsType;
@@ -56,9 +57,10 @@ class PatientController extends Controller
     
         // Check actions for today
         $actionsWaiting = Action::whereDate('created_at', $today)
-            ->with(['patient', 'actionType']) // Using the correct relationship
-            ->paginate(6);
-    
+        ->with(['patient', 'actionType'])
+        ->where('Status', false)
+        ->paginate(6);
+       
         // Debugging: check if there are any actions for today
         // dd($actionsWaiting);
     
@@ -70,13 +72,13 @@ class PatientController extends Controller
         $done = Action::whereDate('created_at', $today)
             ->where('Status', true)
             ->count();
-    
-        return inertia('Patients/Registeration', [
-            'total_count' => $patientsCount,
-            'waiting' => $waiting,
-            'done' => $done,
-            'actionsWaiting' => $actionsWaiting,
-        ]);
+        
+            return inertia('Patients/Registeration', [
+                'total_count' => Patient::count(),
+                'waiting' => Action::whereDate('created_at', $today)->where('Status', false)->count(),
+                'done' => Action::whereDate('created_at', $today)->where('Status', true)->count(),
+                'actionsWaiting' => ActionResource::collection($actionsWaiting),
+            ]);
     }
           
 
@@ -109,7 +111,11 @@ class PatientController extends Controller
     {
         $patient = Patient::findOrFail($patientId);
         $actions = ActionsType::all(); 
-        $action = action::where('patient_id', $patientId)->orderBy('created_at', 'desc')->paginate(5);
+        $action = action::where('patient_id', $patientId)
+        ->orderBy('created_at', 'desc')
+        ->with(['patient', 'actionType'])
+        ->paginate(5);
+
     
         return Inertia::render('Patients/Patient', [
             'patient' => $patient,
