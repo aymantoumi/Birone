@@ -112,17 +112,16 @@ class PatientController extends Controller
         $patient = Patient::findOrFail($patientId);
         $actions = ActionsType::all(); 
         $action = action::where('patient_id', $patientId)
-        ->orderBy('created_at', 'desc')
-        ->with(['patient', 'actionType'])
-        ->paginate(5);
-
+            ->orderBy('created_at', 'desc')
+            ->with(['patient', 'actionType'])
+            ->paginate(5);
     
         return Inertia::render('Patients/Patient', [
             'patient' => $patient,
             'actions' => $action,
             'actionsTypes' => $actions,
         ]);
-    }
+    }    
 
     /**
      * Show the form for editing the specified resource.

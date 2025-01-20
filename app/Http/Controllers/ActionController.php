@@ -76,7 +76,8 @@ class ActionController extends Controller
     public function edit($actionId)
     {
         $action = Action::findOrFail($actionId);
-        return response()->json($action);
+        $actionsTypes = ActionsType::all(); 
+        return response()->json([$action, $actionsTypes]);
     }
 
     /**
@@ -111,19 +112,30 @@ class ActionController extends Controller
      */
     public function update(Request $request, $actionId)
     {
-        logger()->info('Request Data: ', $request->all());
-    
-        $validatedData = $request->validate([
-            'action' => 'required|string',
-            'payment' => 'required|numeric',
+        // Cast the 'action' parameter to an integer before validation
+        $request->merge([
+            'actions_types_id' => (int) $request->input('action')
         ]);
     
-        $validatedData['updated_by'] = auth()->id(); 
+        // Validate the incoming request data
+        $validatedData = $request->validate([
+            'actions_types_id' => 'required|integer|exists:actions_types,id', // Ensure the action type ID is valid
+            'payment' => 'required|numeric', // Ensure payment is a numeric value
+        ]);
     
+        // Find the action by its ID or fail if not found
         $action = Action::findOrFail($actionId);
-        $action->update($validatedData);
     
-        return redirect()->back()->with('success', 'Action updated successfully!');
+        // Update the action with the validated data
+        $action->actions_types_id = $validatedData['actions_types_id'];
+        $action->payment = $validatedData['payment'];
+        $action->updated_by = auth()->id();  
+    
+        // Save the changes to the database
+        $action->save();
+    
+        // Redirect back with a success message
+        return back()->with('success', 'Action updated successfully!');
     }
     
 
@@ -134,5 +146,5 @@ class ActionController extends Controller
     {
         $action->delete();
         return redirect()->back()->with('success', 'Action deleted successfully!');
-    }
+    }    
 }

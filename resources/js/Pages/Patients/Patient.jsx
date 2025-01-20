@@ -135,9 +135,9 @@ export default function Patient({ auth, patient, actions, actionsTypes }) {
                                     value={actionData.Action}  // Ensure this matches the selected action id
                                     onChange={handleActionChange('Action')}
                                 >
-                                    <option value="" disabled>Select visit type</option> 
+                                    <option value="" disabled>Select visit type</option>
                                     {actionsTypes.map((type, index) => (
-                                        <option key={index} value={type.id}>{type.action}</option>  
+                                        <option key={index} value={type.id}>{type.action}</option>
                                     ))}
                                 </select>
 
@@ -234,7 +234,7 @@ export default function Patient({ auth, patient, actions, actionsTypes }) {
 
             {/* Update Modal */}
             {selectedAction && (
-                <Update action={selectedAction} onClose={closeModal} />
+                <Update action={selectedAction} actionsTypes={actionsTypes} onClose={closeModal} />
             )}
         </PatientsLayout>
     );
