@@ -10,19 +10,24 @@ class Patient extends Model
     use HasFactory;
 
     protected $fillable = [
-        'first_name', 'last_name', 'cin', 'category', 'gender', 'phone', 'birth_date', 'created_by', 'updated_by'
-    ];    
-    
+        'First_Name',
+        'Last_Name',
+        'CIN',
+        'Category',
+        'Birth_Date',
+        'Gender',
+        'Phone',
+        'created_by',
+        'updated_by',
+    ];
+
     public function actions()
     {
-        return $this->hasMany(Action::class, 'Patient_ID');
+        return $this->hasMany(Action::class);
     }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'created_by');
     }
-    
-    protected $casts = [
-        'Birth_Date' => 'datetime',
-    ];
 }

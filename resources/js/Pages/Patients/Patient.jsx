@@ -4,7 +4,11 @@ import { Head, useForm } from "@inertiajs/react";
 import Pagination from "../Components/Pagination";
 import Update from './Update';
 
-export default function Patient({ auth, patient, actions }) {
+export default function Patient({ auth, patient, actions, actionsTypes }) {
+
+    console.log(actions);
+
+
     const { data, setData, put, processing, errors } = useForm({
         First_Name: patient.First_Name || "",
         Last_Name: patient.Last_Name || "",
@@ -26,9 +30,13 @@ export default function Patient({ auth, patient, actions }) {
         setData(field, e.target.value);
     };
 
-    const handleActionChange = (field) => (e) => {
-        setActionData(field.toLowerCase(), e.target.value);
+    const handleActionChange = (field) => (event) => {
+        setActionData({
+            ...actionData,
+            [field]: event.target.value, // Update `Action` with the selected `id`
+        });
     };
+
 
     const submitForm = (e) => {
         e.preventDefault();
@@ -122,18 +130,20 @@ export default function Patient({ auth, patient, actions }) {
                         <form onSubmit={submitActionForm} method="POST" className="grid gap-2">
                             <input type="hidden" name="Patient_ID" value={patient.id} />
                             <div className="flex justify-between gap-2 items-center">
-                                <label htmlFor="action" className="dark:text-stone-200 font-extrabold">Action</label>
+                                <label htmlFor="action" className="dark:text-stone-200 font-extrabold">Action </label>
                                 <select
                                     name="Action"
                                     id="action"
                                     className="font-bold rounded-xl w-1/2"
-                                    value={actionData.Action}
+                                    value={actionData.Action}  // Ensure this matches the selected action id
                                     onChange={handleActionChange('Action')}
                                 >
                                     <option value="" disabled>Select visit type</option>
-                                    <option value="visit">Visit</option>
-                                    <option value="consultation">Consultation</option>
+                                    {actionsTypes.map((type, index) => (
+                                        <option key={index} value={type.id}>{type.action}</option>
+                                    ))}
                                 </select>
+
                                 {actionErrors.Action && <span className="text-red-500">{actionErrors.Action}</span>}
                             </div>
                             <div className="flex justify-between gap-2 items-center">
@@ -153,19 +163,24 @@ export default function Patient({ auth, patient, actions }) {
                                     Cancel
                                 </button>
                                 <button type="submit" className="dark:bg-emerald-400 dark:text-green-950 max-w-fit py-2 px-6 rounded-xl font-extrabold hover:bg-green-700 hover:scale-110 bg-emerald-400  transition-all" disabled={processing}>
-                                Add
+                                    Add
                                 </button>
                             </div>
                         </form>
                         {/* Display actions */}
                         {actions.data.map((action, index) => {
                             const formattedDate = new Date(action.created_at).toISOString().split('T')[0];
+                            const actionType = action.action_type?.action || "No action type"; // Fallback to handle missing data
+
                             return (
                                 <div key={index} className="flex justify-between min-w-fit bg-emerald-200 py-2 px-4 rounded-md" onClick={() => handleActionClick(action)}>
-                                    <span>{action.id}</span> <span className="font-extrabold"> {action.action} </span> <span> {formattedDate} </span>
+                                    <span>{action.id}</span>
+                                    <span className="font-extrabold"> {actionType} </span>
+                                    <span> {formattedDate} </span>
                                 </div>
                             );
                         })}
+
                         <Pagination links={actions.links} />
                     </div>
                 </div>
@@ -227,7 +242,7 @@ export default function Patient({ auth, patient, actions }) {
 
             {/* Update Modal */}
             {selectedAction && (
-                <Update action={selectedAction} onClose={closeModal} />
+                <Update action={selectedAction} actionsTypes={actionsTypes} onClose={closeModal} />
             )}
         </PatientsLayout>
     );

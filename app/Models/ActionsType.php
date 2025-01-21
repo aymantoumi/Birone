@@ -11,4 +11,8 @@ class ActionsType extends Model
 
     protected $fillable = ['action'];
 
+    public function actions()
+    {
+        return $this->hasMany(Action::class, 'actions_types_id');
+    }
 }

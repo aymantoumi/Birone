@@ -16,8 +16,8 @@ class ActionResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'patient_id' => $this->Patient_ID,
-            'action' => $this->Action,
+            'patient' => new PatientsResource($this->whenLoaded('patient')),
+            'actionType' => new ActionsTypeResource($this->whenLoaded('actionType')),
             'payment' => $this->Payment,
             'created_by' => $this->created_by,
             'updated_by' => $this->updated_by,

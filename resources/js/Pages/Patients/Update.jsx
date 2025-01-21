@@ -1,11 +1,19 @@
-import Modal from '@/Components/Modal'; 
+import { useEffect } from 'react';
+import Modal from '@/Components/Modal';
 import { useForm } from '@inertiajs/react';
 
-export default function Update({ action, onClose }) {
+export default function Update({ action, onClose, actionsTypes }) {
     const { data, setData, put, delete: destroy, processing, errors } = useForm({
         action: action.action,
         payment: action.payment,
     });
+
+    useEffect(() => {
+        setData({
+            action: action.actions_types_id, // Set the action type ID
+            payment: action.payment,
+        });
+    }, [action]);
 
     const handleUpdate = (e) => {
         e.preventDefault();
@@ -19,18 +27,19 @@ export default function Update({ action, onClose }) {
             onSuccess: () => onClose(),
         });
     };
+
     const formattedDate = new Date(action.created_at).toISOString().split('T')[0];
 
     return (
         <Modal show={true} onClose={onClose}>
             <form onSubmit={handleUpdate} className="grid gap-5 py-5 px-4">
                 <div className="flex justify-between gap-2 items-center dark:text-stone-200 font-extrabold">
-                <span className="">
-                    N : {action.id}
-                </span>
-                <span>
-                    {formattedDate}
-                </span>
+                    <span className="">
+                        N : {action.id}
+                    </span>
+                    <span>
+                        {formattedDate}
+                    </span>
                 </div>
                 <div className="flex justify-between gap-2 items-center">
                     <label htmlFor="action" className="dark:text-stone-200 font-extrabold">Action</label>
@@ -41,8 +50,9 @@ export default function Update({ action, onClose }) {
                         value={data.action}
                         onChange={(e) => setData('action', e.target.value)}
                     >
-                        <option value="visit">Visit</option>
-                        <option value="consultation">Consultation</option>
+                        {actionsTypes && actionsTypes.map((type, index) => (
+                            <option key={index} value={type.id}>{type.action}</option>
+                        ))}
                     </select>
                     {errors.action && <span className="text-red-500">{errors.action}</span>}
                 </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Action;
+use App\Models\ActionsType;
 use App\Models\Patient;
 use Illuminate\Http\Request;
 
@@ -29,31 +30,36 @@ class ActionController extends Controller
      */
     public function store(Request $request, $patientId)
     {
+        // Validate incoming data
         $validatedData = $request->validate([
-            'action' => 'required|string',
-            'payment' => 'required|numeric',
+            'Action' => 'required|integer|exists:actions_types,id', // Ensure Action is a valid action type ID
+            'Payment' => 'nullable|numeric',
         ]);
-
-        // Add the user ID to the validated data
-        $validatedData['patient_id'] = $patientId;
-        $validatedData['created_by'] = auth()->id(); 
-        $validatedData['updated_by'] = auth()->id(); 
-
-        // Create the action
-        $action = Action::create($validatedData);
-
+    
+        // Prepare the data for the actions table
+        $data = [
+            'patient_id' => $patientId,
+            'actions_types_id' => $validatedData['Action'], // Use Action ID from the form
+            'payment' => $validatedData['Payment'] ?? 0, // Default to 0 if no payment is provided
+            'created_by' => auth()->id(),
+            'updated_by' => auth()->id(),
+        ];
+    
+        // Insert the new action record
+        $action = Action::create($data);
+    
         // Find the patient and update the status if necessary
         $patient = Patient::findOrFail($patientId);
-
+    
         if ($patient->status) {
             $patient->status = false;
             $patient->save();
         }
-
+    
         // Redirect to the Patients creation route
-        return to_route('Patients.create');
+        return to_route('Patients.create')->with('success', 'Action successfully created.');
     }
-
+    
 
     /**
      * Display the specified resource.
@@ -69,7 +75,8 @@ class ActionController extends Controller
     public function edit($actionId)
     {
         $action = Action::findOrFail($actionId);
-        return response()->json($action);
+        $actionsTypes = ActionsType::all(); 
+        return response()->json([$action, $actionsTypes]);
     }
 
     /**
@@ -79,36 +86,55 @@ class ActionController extends Controller
      */
     public function changeStatus(Request $request, $actionId)
     {
+        // Validate the input
         $validated = $request->validate([
             'status' => 'required|boolean',
         ]);
-
-        $patient = Action::findOrFail($actionId);
-        $patient->Status = $validated['status'];
-        $validatedData['updated_by'] = auth()->id(); 
-
-        $patient->save();
-
-        return back()->with('success', 'Patient status updated successfully!');
-    }
+    
+        // Find the Action model by ID
+        $action = Action::findOrFail($actionId);
+        
+        // Update the status field on the Action model
+        $action->Status = $validated['status'];
+        
+        // Optionally, store who updated the action
+        $action->updated_by = auth()->id();
+        
+        // Save the changes
+        $action->save();
+    
+        // Return a success message
+        return back()->with('success', 'Action status updated successfully!');
+    }    
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, $actionId)
     {
-        logger()->info('Request Data: ', $request->all());
-    
-        $validatedData = $request->validate([
-            'action' => 'required|string',
-            'payment' => 'required|numeric',
+        // Cast the 'action' parameter to an integer before validation
+        $request->merge([
+            'actions_types_id' => (int) $request->input('action')
         ]);
     
-        $validatedData['updated_by'] = auth()->id(); 
+        // Validate the incoming request data
+        $validatedData = $request->validate([
+            'actions_types_id' => 'required|integer|exists:actions_types,id', // Ensure the action type ID is valid
+            'payment' => 'required|numeric', // Ensure payment is a numeric value
+        ]);
     
+        // Find the action by its ID or fail if not found
         $action = Action::findOrFail($actionId);
-        $action->update($validatedData);
     
-        return redirect()->back()->with('success', 'Action updated successfully!');
+        // Update the action with the validated data
+        $action->actions_types_id = $validatedData['actions_types_id'];
+        $action->payment = $validatedData['payment'];
+        $action->updated_by = auth()->id();  
+    
+        // Save the changes to the database
+        $action->save();
+    
+        // Redirect back with a success message
+        return back()->with('success', 'Action updated successfully!');
     }
     
 
@@ -119,5 +145,5 @@ class ActionController extends Controller
     {
         $action->delete();
         return redirect()->back()->with('success', 'Action deleted successfully!');
-    }
+    }    
 }
