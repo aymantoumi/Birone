@@ -6,6 +6,9 @@ import Update from './Update';
 
 export default function Patient({ auth, patient, actions, actionsTypes }) {
 
+    console.log(actions);
+
+
     const { data, setData, put, processing, errors } = useForm({
         First_Name: patient.First_Name || "",
         Last_Name: patient.Last_Name || "",
@@ -167,12 +170,17 @@ export default function Patient({ auth, patient, actions, actionsTypes }) {
                         {/* Display actions */}
                         {actions.data.map((action, index) => {
                             const formattedDate = new Date(action.created_at).toISOString().split('T')[0];
+                            const actionType = action.action_type?.action || "No action type"; // Fallback to handle missing data
+
                             return (
                                 <div key={index} className="flex justify-between min-w-fit bg-emerald-200 py-2 px-4 rounded-md" onClick={() => handleActionClick(action)}>
-                                    <span>{action.id}</span> <span className="font-extrabold"> {action.actionType?.action} </span> <span> {formattedDate} </span>
+                                    <span>{action.id}</span>
+                                    <span className="font-extrabold"> {actionType} </span>
+                                    <span> {formattedDate} </span>
                                 </div>
                             );
                         })}
+
                         <Pagination links={actions.links} />
                     </div>
                 </div>

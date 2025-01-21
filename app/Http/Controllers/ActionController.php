@@ -43,7 +43,6 @@ class ActionController extends Controller
             'payment' => $validatedData['Payment'] ?? 0, // Default to 0 if no payment is provided
             'created_by' => auth()->id(),
             'updated_by' => auth()->id(),
-            'Status' => true, // Assuming Status is true by default
         ];
     
         // Insert the new action record

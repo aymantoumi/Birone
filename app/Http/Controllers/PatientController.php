@@ -54,16 +54,14 @@ class PatientController extends Controller
     public function create()
     {
         $today = date('Y-m-d');
-    
+
         // Check actions for today
         $actionsWaiting = Action::whereDate('created_at', $today)
-        ->with(['patient', 'actionType'])
-        ->where('Status', false)
-        ->paginate(6);
-       
-        // Debugging: check if there are any actions for today
-        // dd($actionsWaiting);
-    
+            ->with(['patient', 'actionType'])
+            ->where('Status', false)
+            ->paginate(6);
+
+
         // Other statistics
         $patientsCount = Patient::count();
         $waiting = Action::whereDate('created_at', $today)
@@ -72,15 +70,15 @@ class PatientController extends Controller
         $done = Action::whereDate('created_at', $today)
             ->where('Status', true)
             ->count();
-        
-            return inertia('Patients/Registeration', [
-                'total_count' => Patient::count(),
-                'waiting' => Action::whereDate('created_at', $today)->where('Status', false)->count(),
-                'done' => Action::whereDate('created_at', $today)->where('Status', true)->count(),
-                'actionsWaiting' => ActionResource::collection($actionsWaiting),
-            ]);
+
+        return inertia('Patients/Registeration', [
+            'total_count' => Patient::count(),
+            'waiting' => Action::whereDate('created_at', $today)->where('Status', false)->count(),
+            'done' => Action::whereDate('created_at', $today)->where('Status', true)->count(),
+            'actionsWaiting' => ActionResource::collection($actionsWaiting),
+        ]);
     }
-          
+
 
 
     /**
@@ -110,16 +108,20 @@ class PatientController extends Controller
     public function show($patientId)
     {
         $patient = Patient::findOrFail($patientId);
-        $actions = ActionsType::all(); 
-        $action = action::where('patient_id', $patientId)
+        
+        // Load actions with actionType relationship
+        $actions = Action::where('patient_id', $patientId)
             ->orderBy('created_at', 'desc')
-            ->with(['patient', 'actionType'])
+            ->with(['actionType'])  // Ensure the actionType is loaded
             ->paginate(5);
+    
+        // Get all actions types for dropdown or selection, as needed
+        $actionsTypes = ActionsType::all();
     
         return Inertia::render('Patients/Patient', [
             'patient' => $patient,
-            'actions' => $action,
-            'actionsTypes' => $actions,
+            'actions' => $actions,
+            'actionsTypes' => $actionsTypes,
         ]);
     }    
 
@@ -144,19 +146,19 @@ class PatientController extends Controller
             'Gender' => 'required|string|max:20',
             'Phone' => 'nullable|digits:10',
         ]);
-    
+
         $patient = Patient::findOrFail($patientId);
-    
+
         $patient->First_Name = $validatedData['First_Name'];
         $patient->Last_Name = $validatedData['Last_Name'];
         $patient->Birth_Date = $validatedData['Birth_Date'];
         $patient->Gender = $validatedData['Gender'];
         $patient->CIN = $validatedData['CIN'];
         $patient->Phone = $validatedData['Phone'];
-        $patient->updated_by = auth()->id();  
-    
+        $patient->updated_by = auth()->id();
+
         $patient->save();
-    
+
         return back()->with('success', 'Patient updated successfully.');
     }
     /**
