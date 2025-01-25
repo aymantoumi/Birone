@@ -139,28 +139,28 @@ class PatientController extends Controller
     public function update(Request $request, string $patientId)
     {
         $validatedData = $request->validate([
-            'First_Name' => 'required|string|max:20',
-            'Last_Name' => 'required|string|max:20',
-            'CIN' => 'nullable|string',
-            'Birth_Date' => 'nullable|date',
-            'Gender' => 'required|string|max:20',
-            'Phone' => 'nullable|digits:10',
+            'first_name' => 'required|string|max:20',
+            'last_name' => 'required|string|max:20',
+            'cin' => 'nullable|string',
+            'birth_date' => 'nullable|date',
+            'gender' => 'required|string|max:20',
+            'phone' => 'nullable|digits:10',
         ]);
-
+    
         $patient = Patient::findOrFail($patientId);
-
-        $patient->First_Name = $validatedData['First_Name'];
-        $patient->Last_Name = $validatedData['Last_Name'];
-        $patient->Birth_Date = $validatedData['Birth_Date'];
-        $patient->Gender = $validatedData['Gender'];
-        $patient->CIN = $validatedData['CIN'];
-        $patient->Phone = $validatedData['Phone'];
+    
+        $patient->first_name = $validatedData['first_name'];
+        $patient->last_name = $validatedData['last_name'];
+        $patient->birth_date = $validatedData['birth_date'];
+        $patient->gender = $validatedData['gender'];
+        $patient->cin = $validatedData['cin'];
+        $patient->phone = $validatedData['phone'];
         $patient->updated_by = auth()->id();
-
+    
         $patient->save();
-
+    
         return back()->with('success', 'Patient updated successfully.');
-    }
+    }    
     /**
      * Remove the specified resource from storage.
      */
