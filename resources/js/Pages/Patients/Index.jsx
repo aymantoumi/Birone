@@ -1,11 +1,10 @@
+
 import PatientsLayout from '@/Layouts/PatientsLayout';
 import { Head, Link, router } from "@inertiajs/react";
 import Pagination from '../Components/Pagination';
-import { Ziggy } from '@/ziggy';
 
 
-export default function Index({ auth, patients, queryParams = {} }) {
-    // Function to handle changes in search fields
+export default function Index({ auth, patients, queryParams = {} }) {    
     const fieldChanged = (name, value) => {
         const newQueryParams = { ...queryParams }; // Copy existing query parameters
         if (value?.trim()) {

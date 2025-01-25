@@ -16,18 +16,18 @@ class PatientsResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'first_name' => $this->First_Name,
-            'last_name' => $this->Last_Name,
-            'cin' => $this->CIN,
-            'category' => $this->Category,
-            'birth_date' => $this->Birth_Date,
-            'gender' => $this->Gender,
-            'phone' => $this->Phone,
-            'status' => $this->Status,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'cin' => $this->cin,
+            'category' => $this->category,
+            'birth_date' => $this->birth_date,
+            'gender' => $this->gender,
+            'phone' => $this->phone,
+            'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'created_by' => $this->created_by,
             'updated_by' => $this->updated_by,
         ];
-    }
+    }    
 }

@@ -10,12 +10,12 @@ export default function Patient({ auth, patient, actions, actionsTypes }) {
 
 
     const { data, setData, put, processing, errors } = useForm({
-        First_Name: patient.First_Name || "",
-        Last_Name: patient.Last_Name || "",
-        Birth_Date: patient.Birth_Date || "",
-        CIN: patient.CIN || "",
-        Gender: patient.Gender || "",
-        Phone: patient.Phone || "",
+        first_name: patient.first_name || "",
+        last_name: patient.last_name || "",
+        birth_date: patient.birth_date || "",
+        cin: patient.cin || "",
+        gender: patient.gender || "",
+        phone: patient.phone || "",
         _method: "PUT",
     });
 
@@ -33,7 +33,7 @@ export default function Patient({ auth, patient, actions, actionsTypes }) {
     const handleActionChange = (field) => (event) => {
         setActionData({
             ...actionData,
-            [field]: event.target.value, // Update `Action` with the selected `id`
+            [field]: event.target.value,
         });
     };
 
@@ -68,7 +68,7 @@ export default function Patient({ auth, patient, actions, actionsTypes }) {
             user={auth.user}
             header={
                 <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                    Edit Patient "{patient.First_Name} {patient.Last_Name}"
+                    Edit Patient "{patient.first_name} {patient.last_name}"
                 </h2>
             }
         >
@@ -81,7 +81,7 @@ export default function Patient({ auth, patient, actions, actionsTypes }) {
                         method="POST"
                     >
                         <div className="flex flex-col gap-5">
-                            {["First_Name", "Last_Name", "CIN", "Phone"].map((field) => (
+                            {["first_name", "last_name", "cin", "phone"].map((field) => (
                                 <div key={field} className="flex justify-between items-center gap-2 min-w-fit">
                                     <h1 className="font-extrabold dark:text-stone-500 text-lg">{field.replace("_", " ")}:</h1>
                                     <input
@@ -98,25 +98,26 @@ export default function Patient({ auth, patient, actions, actionsTypes }) {
                                 <input
                                     type="date"
                                     className="font-bold rounded-xl"
-                                    value={data.Birth_Date ? new Date(data.Birth_Date).toISOString().slice(0, 10) : ""}
-                                    onChange={handleChange("Birth_Date")}
+                                    value={data.birth_date ? new Date(data.birth_date).toISOString().slice(0, 10) : ""}
+                                    onChange={handleChange("birth_date")}
                                 />
-                                {errors.Birth_Date && <span className="text-red-500">{errors.Birth_Date}</span>}
+                                {errors.birth_date && <span className="text-red-500">{errors.birth_date}</span>}
                             </div>
                             <div className="flex justify-between items-center gap-2 min-w-fit">
                                 <h1 className="font-extrabold dark:text-stone-500 text-lg">Gender:</h1>
                                 <select
                                     className="font-bold rounded-xl"
-                                    value={data.Gender}
-                                    onChange={handleChange("Gender")}
+                                    value={data.gender}
+                                    onChange={handleChange("gender")}
                                 >
                                     <option value="">Select Gender</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
                                 </select>
-                                {errors.Gender && <span className="text-red-500">{errors.Gender}</span>}
+                                {errors.gender && <span className="text-red-500">{errors.gender}</span>}
                             </div>
                         </div>
+
                         <button
                             type="submit"
                             className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-lg mt-4"
@@ -138,7 +139,7 @@ export default function Patient({ auth, patient, actions, actionsTypes }) {
                                     value={actionData.Action}  // Ensure this matches the selected action id
                                     onChange={handleActionChange('Action')}
                                 >
-                                    <option value="" disabled>Select visit type</option>
+                                    <option value="" disabled selected>Select visit type</option>
                                     {actionsTypes.map((type, index) => (
                                         <option key={index} value={type.id}>{type.action}</option>
                                     ))}
