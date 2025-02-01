@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ActionController;
 use App\Http\Controllers\ActionsTypeController;
+use App\Http\Controllers\categories;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Settings;
@@ -14,6 +15,7 @@ Route::redirect('/', '/dashboard');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', fn() => Inertia::render('Dashboard'))->name('dashboard');
     Route::resource('Patients', PatientController::class);
+    Route::resource('categories', categories::class);
     Route::resource('patients.actions', ActionController::class)->shallow();
     Route::put('actions/{action}', [ActionController::class, 'update'])->name('actions.update');
     Route::post('/patients/{patient}/change-status', [ActionController::class, 'changeStatus'])->name('action.changeStatus');

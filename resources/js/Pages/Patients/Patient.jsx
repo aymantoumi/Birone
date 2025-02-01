@@ -4,10 +4,7 @@ import { Head, useForm } from "@inertiajs/react";
 import Pagination from "../Components/Pagination";
 import Update from './Update';
 
-export default function Patient({ auth, patient, actions, actionsTypes }) {
-
-    console.log(actions);
-
+export default function Patient({ auth, patient, actions, actionsTypes, categories }) {
 
     const { data, setData, put, processing, errors } = useForm({
         first_name: patient.first_name || "",
@@ -16,6 +13,7 @@ export default function Patient({ auth, patient, actions, actionsTypes }) {
         cin: patient.cin || "",
         gender: patient.gender || "",
         phone: patient.phone || "",
+        category_id: patient.category_id || "",  // Add category_id here
         _method: "PUT",
     });
 
@@ -36,7 +34,6 @@ export default function Patient({ auth, patient, actions, actionsTypes }) {
             [field]: event.target.value,
         });
     };
-
 
     const submitForm = (e) => {
         e.preventDefault();
@@ -94,6 +91,22 @@ export default function Patient({ auth, patient, actions, actionsTypes }) {
                                 </div>
                             ))}
                             <div className="flex justify-between items-center gap-2 min-w-fit">
+                                <h1 className="font-extrabold dark:text-stone-500 text-lg">Category:</h1>
+                                <select
+                                    className="font-bold rounded-xl"
+                                    value={data.category_id || ""}
+                                    onChange={(e) => setData("category_id", e.target.value)}
+                                >
+                                    <option value="">Select Category</option>
+                                    {categories.map((category) => (
+                                        <option key={category.id} value={category.id}>
+                                            {category.category}
+                                        </option>
+                                    ))}
+                                </select>
+                                {errors.category_id && <span className="text-red-500">{errors.category_id}</span>}
+                            </div>
+                            <div className="flex justify-between items-center gap-2 min-w-fit">
                                 <h1 className="font-extrabold dark:text-stone-500 text-lg">Birthdate:</h1>
                                 <input
                                     type="date"
@@ -107,12 +120,12 @@ export default function Patient({ auth, patient, actions, actionsTypes }) {
                                 <h1 className="font-extrabold dark:text-stone-500 text-lg">Gender:</h1>
                                 <select
                                     className="font-bold rounded-xl"
-                                    value={data.gender}
-                                    onChange={handleChange("gender")}
+                                    value={data.gender || ""}
+                                    onChange={(e) => setData("gender", e.target.value)}
                                 >
                                     <option value="">Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
                                 </select>
                                 {errors.gender && <span className="text-red-500">{errors.gender}</span>}
                             </div>
