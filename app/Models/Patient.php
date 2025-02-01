@@ -13,13 +13,18 @@ class Patient extends Model
         'first_name',
         'last_name',
         'cin',
-        'category',
+        'category_id', 
         'birth_date',
         'gender',
         'phone',
         'created_by',
         'updated_by',
     ];    
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 
     public function actions()
     {
@@ -31,3 +36,4 @@ class Patient extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 }
+

@@ -2,12 +2,14 @@ import PatientsLayout from "@/Layouts/PatientsLayout";
 import { Head, useForm } from "@inertiajs/react";
 import Pagination from "../Components/Pagination";
 
-export default function Registration({ auth, total_count, waiting, done, actionsWaiting }) {
+export default function Registration({ auth, total_count, waiting, done, actionsWaiting, categories }) {
+    console.log(categories);
+
     const { data, setData, post, processing, errors } = useForm({
         first_name: '',
         last_name: '',
         cin: '',
-        category: '',
+        category_id: '',
         gender: '',
         phone: '',
         birth_date: '',
@@ -90,7 +92,20 @@ export default function Registration({ auth, total_count, waiting, done, actions
                             </div>
                             <div className="flex flex-col">
                                 <label htmlFor="category" className="dark:text-gray-100 font-extrabold">Category</label>
-                                <input type="text" name="category" id="category" className="max-w-96 rounded-lg" value={data.category} onChange={e => setData('category', e.target.value)} />
+                                <select
+                                    name="category_id"
+                                    id="category"
+                                    className="max-w-96 rounded-lg"
+                                    value={data.category_id} 
+                                    onChange={(e) => setData('category_id', e.target.value)}
+                                >
+                                    <option value="" disabled>Select Category</option>
+                                    {categories?.map((category) => (
+                                        <option key={category.id} value={category.id}>{category.category}</option>
+                                    ))}
+                                </select>
+                                {errors.category_id && <span className="text-red-500">{errors.category_id}</span>}
+
                                 {errors.category && <span className="text-red-500">{errors.category}</span>}
                             </div>
                             <div className="flex flex-col">

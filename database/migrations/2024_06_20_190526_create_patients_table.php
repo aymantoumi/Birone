@@ -12,19 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('patients', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('first_name', 50);  
-            $table->string('last_name', 50);   
-            $table->string('cin')->nullable();
-            $table->string('category', 50);    
-            $table->dateTime('birth_date')->nullable();
-            $table->string('gender', 20);
+            $table->id();
+            $table->string('first_name', 50);
+            $table->string('last_name', 50);
+            $table->string('cin')->nullable()->unique();
+            $table->date('birth_date')->nullable();
+            $table->enum('gender', ['male', 'female']);
             $table->string('phone', 20)->nullable();
-            $table->foreignId('created_by')->nullable()->constrained('users', 'id')->onDelete('set null')->onUpdate('cascade');
-            $table->foreignId('updated_by')->nullable()->constrained('users', 'id')->onDelete('set null')->onUpdate('cascade');
+            $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null')->onUpdate('cascade');
+            $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null')->onUpdate('cascade');
             $table->timestamps();
-        });        
-    }
+        });
+    }    
     /**
      * Reverse the migrations.
      */

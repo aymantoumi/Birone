@@ -6,6 +6,7 @@ use App\Http\Resources\ActionResource;
 use App\Http\Resources\PatientsResource;
 use App\Models\action;
 use App\Models\ActionsType;
+use App\Models\Category;
 use App\Models\Patient;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -60,22 +61,14 @@ class PatientController extends Controller
             ->with(['patient', 'actionType'])
             ->where('Status', false)
             ->paginate(6);
-
-
-        // Other statistics
-        $patientsCount = Patient::count();
-        $waiting = Action::whereDate('created_at', $today)
-            ->where('Status', false)
-            ->count();
-        $done = Action::whereDate('created_at', $today)
-            ->where('Status', true)
-            ->count();
+        $categories = Category::orderBy('created_at', 'desc')->get();
 
         return inertia('Patients/Registeration', [
             'total_count' => Patient::count(),
             'waiting' => Action::whereDate('created_at', $today)->where('Status', false)->count(),
             'done' => Action::whereDate('created_at', $today)->where('Status', true)->count(),
             'actionsWaiting' => ActionResource::collection($actionsWaiting),
+            'categories' => $categories,
         ]);
     }
 
@@ -90,7 +83,7 @@ class PatientController extends Controller
             'first_name' => 'required|string|max:20',
             'last_name' => 'required|string|max:20',
             'cin' => 'nullable|string',
-            'category' => 'required|string|max:20',
+            'category_id' => 'required|integer|max:20',
             'gender' => 'required|string|max:20',
             'phone' => 'nullable|digits:10',
             'birth_date' => 'nullable|date',
@@ -108,22 +101,26 @@ class PatientController extends Controller
     public function show($patientId)
     {
         $patient = Patient::findOrFail($patientId);
-        
+
         // Load actions with actionType relationship
         $actions = Action::where('patient_id', $patientId)
             ->orderBy('created_at', 'desc')
             ->with(['actionType'])  // Ensure the actionType is loaded
             ->paginate(5);
-    
+
         // Get all actions types for dropdown or selection, as needed
         $actionsTypes = ActionsType::all();
-    
+
+        // Get all categories
+        $categories = Category::all();
+
         return Inertia::render('Patients/Patient', [
             'patient' => $patient,
             'actions' => $actions,
             'actionsTypes' => $actionsTypes,
+            'categories' => $categories,  
         ]);
-    }    
+    }
 
     /**
      * Show the form for editing the specified resource.
@@ -145,6 +142,7 @@ class PatientController extends Controller
             'birth_date' => 'nullable|date',
             'gender' => 'required|string|max:20',
             'phone' => 'nullable|digits:10',
+            'category_id' => 'nullable|exists:categories,id', 
         ]);
     
         $patient = Patient::findOrFail($patientId);
@@ -155,6 +153,7 @@ class PatientController extends Controller
         $patient->gender = $validatedData['gender'];
         $patient->cin = $validatedData['cin'];
         $patient->phone = $validatedData['phone'];
+        $patient->category_id = $validatedData['category_id']; 
         $patient->updated_by = auth()->id();
     
         $patient->save();
