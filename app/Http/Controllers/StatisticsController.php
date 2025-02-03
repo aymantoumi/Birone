@@ -30,7 +30,6 @@ class StatisticsController extends Controller
         }
 
         $male_count = (clone $query)->where('gender', 'male')->count();
-
         $female_count = (clone $query)->where('gender', 'female')->count();
 
         $actionTypeCounts = Action::select('actions_types_id', DB::raw('count(*) as total'))
@@ -51,12 +50,30 @@ class StatisticsController extends Controller
             ->with('actionType')
             ->get();
 
+        // Generate all dates for the current month
+        $startOfMonth = Carbon::parse($fromDate)->startOfMonth();
+        $endOfMonth = Carbon::parse($toDate)->endOfMonth();
+        $allDates = [];
+        for ($date = $startOfMonth; $date->lte($endOfMonth); $date->addDay()) {
+            $allDates[] = $date->format('Y-m-d');
+        }
+
+        // Fetch payments per day
+        $paymentsPerDay = Action::select(DB::raw('DATE(created_at) as date'), DB::raw('sum(payment) as total_payment'))
+            ->whereBetween('created_at', [$fromDate, $toDate])
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->pluck('total_payment', 'date')->toArray();
+
+        // Merge with all dates to ensure all days are represented
+        $paymentsPerDay = array_merge(array_fill_keys($allDates, 0), $paymentsPerDay);
+
         return inertia('Statistics/Index', [
             'male_count' => $male_count,
             'female_count' => $female_count,
             'actionTypeCounts' => $actionTypeCounts,
             'actionsByStatus' => $actionsByStatus,
             'paymentsByActionType' => $paymentsByActionType,
+            'paymentsPerDay' => $paymentsPerDay,
         ]);
     }
 

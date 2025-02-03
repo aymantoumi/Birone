@@ -34,7 +34,7 @@ export default function ActionsCount({ actionTypeCounts })
     };
 
     return (
-        <div>
+        <div className='min-h-[28em]'>
             <Bar data={dataChart} options={options} />
         </div>
     ); 
