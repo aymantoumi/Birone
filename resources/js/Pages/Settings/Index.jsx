@@ -40,7 +40,7 @@ export default function Index({ auth, actionsType, categories }) {
             <Head title="Settings" />
             <section className="py-8 px-12 flex flex-wrap gap-4">
                 {/* Actions management */}
-                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-gray-700">
+                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-gray-700 bg-sky-400">
                     <h1 className="dark:text-amber-950 text-2xl font-extrabold">Actions Management</h1>
                     <div className="flex flex-col gap-5">
                         {/* Actions Form */}
@@ -71,9 +71,9 @@ export default function Index({ auth, actionsType, categories }) {
                 </div>
 
                 {/* Categories */}
-                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-gray-700">
+                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-gray-700 bg-sky-400">
                     <h1 className="dark:text-amber-950 text-2xl font-extrabold">Categories Management</h1>
-                    <div className="flex flex-col gap-5">
+                    <div className="flex flex-col gap-5 ">
                         <Categories />
                         <div className="flex-1 min-w-[8em] min-h-[6em] bg-stone-400 rounded-xl px-6 py-4">
                             {categories && categories.data && categories.data.length > 0 ? (
@@ -100,12 +100,12 @@ export default function Index({ auth, actionsType, categories }) {
                 </div>
 
                 {/* Blood Groups */}
-                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-stone-100">
+                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-stone-100 bg-sky-400">
                     <h1 className="dark:text-amber-950 text-2xl font-extrabold">Blood Groups</h1>
                 </div>
 
                 {/* Medication Class */}
-                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-stone-100">
+                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-stone-100 bg-sky-400">
                     <h1 className="dark:text-amber-950 text-2xl font-extrabold">Medication Class</h1>
                 </div>
             </section>

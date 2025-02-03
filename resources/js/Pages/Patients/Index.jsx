@@ -6,27 +6,22 @@ import Pagination from '../Components/Pagination';
 
 export default function Index({ auth, patients, queryParams = {} }) {    
     const fieldChanged = (name, value) => {
-        const newQueryParams = { ...queryParams }; // Copy existing query parameters
+        const newQueryParams = { ...queryParams }; 
         if (value?.trim()) {
-            newQueryParams[name] = value.trim(); // Add or update the field
+            newQueryParams[name] = value.trim(); 
         } else {
-            delete newQueryParams[name]; // Remove field if value is empty
+            delete newQueryParams[name]; 
         }
 
-        // Log for debugging
-        console.log('Navigating with Query Params:', newQueryParams);
-
-        // Update URL with new query parameters
         router.get(route('Patients.index'), newQueryParams, {
             preserveScroll: true,
             preserveState: true,
         });
     };
 
-    // Function to handle 'Enter' key press in input fields
     const onKeyPress = (name, e) => {
-        if (e.key !== 'Enter') return; // Only handle Enter key
-        fieldChanged(name, e.target.value); // Update query params
+        if (e.key !== 'Enter') return; 
+        fieldChanged(name, e.target.value); 
     };
 
     return (

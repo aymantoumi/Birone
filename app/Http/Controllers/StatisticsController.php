@@ -13,38 +13,40 @@ class StatisticsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $currentMonth = Carbon::now()->month;
-        $currentYear = Carbon::now()->year;
+        $fromDate = $request->input('from');
+        $toDate = $request->input('to');
 
-        $male_count = Patient::where('gender', 'male')
-            ->whereMonth('created_at', $currentMonth)
-            ->whereYear('created_at', $currentYear)
-            ->count();
+        if (!$fromDate || !$toDate) {
+            $fromDate = Carbon::now()->startOfMonth()->toDateString();
+            $toDate = Carbon::now()->endOfMonth()->toDateString();
+        }
 
-        $female_count = Patient::where('gender', 'female')
-            ->whereMonth('created_at', $currentMonth)
-            ->whereYear('created_at', $currentYear)
-            ->count();
+        $query = Patient::query();
+
+        if ($fromDate && $toDate) {
+            $query->whereBetween('created_at', [$fromDate, $toDate]);
+        }
+
+        $male_count = (clone $query)->where('gender', 'male')->count();
+
+        $female_count = (clone $query)->where('gender', 'female')->count();
 
         $actionTypeCounts = Action::select('actions_types_id', DB::raw('count(*) as total'))
-            ->whereMonth('created_at', $currentMonth)
-            ->whereYear('created_at', $currentYear)
+            ->whereBetween('created_at', [$fromDate, $toDate])
             ->groupBy('actions_types_id')
             ->with('actionType')
             ->get();
 
         $actionsByStatus = Action::select('actions_types_id', 'Status', DB::raw('count(*) as total'))
-            ->whereMonth('created_at', $currentMonth)
-            ->whereYear('created_at', $currentYear)
+            ->whereBetween('created_at', [$fromDate, $toDate])
             ->groupBy('actions_types_id', 'Status')
             ->with('actionType')
             ->get();
 
         $paymentsByActionType = Action::select('actions_types_id', DB::raw('sum(payment) as total_payment'))
-            ->whereMonth('created_at', $currentMonth)
-            ->whereYear('created_at', $currentYear)
+            ->whereBetween('created_at', [$fromDate, $toDate])
             ->groupBy('actions_types_id')
             ->with('actionType')
             ->get();

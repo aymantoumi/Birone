@@ -12,8 +12,8 @@ export default function Dashboard({ auth, patientsPerDay, actionsPerDay, finishe
             <Head title="Dashboard" />
 
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg px-10 py-14">
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 ">
+                    <div className="bg-sky-200 dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg px-10 py-14 ">
                         <Clock />
                         <DailyCountsLineChart
                             patientsPerDay={patientsPerDay}
