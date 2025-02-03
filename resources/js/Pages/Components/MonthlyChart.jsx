@@ -61,7 +61,7 @@ export default function DailyCountsLineChart({ patientsPerDay, actionsPerDay, fi
     };
 
     return (
-        <div className='min-h-[25rem]'>
+        <div className='min-h-[35rem]'>
             <Line data={dataChart} options={options} />
         </div>
     );

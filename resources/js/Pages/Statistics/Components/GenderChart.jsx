@@ -29,7 +29,7 @@ export default function GenderChart({ male, female }) {
     }
 
     return (
-        <div >
+        <div className='min-h-[28em]'>
             <Bar data={dataChart} options={options} />
         </div>
     );
