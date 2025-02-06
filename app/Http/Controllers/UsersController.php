@@ -19,35 +19,35 @@ class UsersController extends Controller
     public function index()
     {
         $query = User::query();
-    
+
         if (request('name')) {
             $query->where(function ($q) {
                 $q->where('name', 'like', "%" . request('name') . "%");
             });
         }
-    
+
         if (request('email')) {
             $query->where('email', 'like', "%" . request('email') . "%");
         }
-    
+
         if (request('role')) {
             $query->where('role', request('role'));
         }
-    
+
         $users = $query->orderBy('created_at', 'desc')->paginate(10);
-    
-        return inertia('UsersManagement/Index', [
+
+        return inertia('UsersManagement/index', [
             'users' => $users,
             'queryParams' => request()->query() ?: null,
         ]);
-    }    
+    }
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-        return inertia('UsersManagement/Create');
+        return inertia('UsersManagement/create');
     }
 
     /**
@@ -83,16 +83,16 @@ class UsersController extends Controller
     public function edit(Request $request, string $id)
     {
         $user = User::findOrFail($id);
-    
+
         // Determine the date range
         $fromDate = $request->input('from');
         $toDate = $request->input('to');
-    
+
         if (!$fromDate || !$toDate) {
             $fromDate = Carbon::now()->startOfMonth()->toDateString();
             $toDate = Carbon::now()->endOfMonth()->toDateString();
         }
-    
+
         // Generate all dates for the current month or specified range
         $startOfMonth = Carbon::parse($fromDate)->startOfMonth();
         $endOfMonth = Carbon::parse($toDate)->endOfMonth();
@@ -100,39 +100,43 @@ class UsersController extends Controller
         for ($date = $startOfMonth; $date->lte($endOfMonth); $date->addDay()) {
             $allDates[] = $date->format('Y-m-d');
         }
-    
-        // Fetch actions per day
+
+        // Fetch actions per day for the specific user
         $actionsPerDay = Action::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
+            ->where('created_by', $user->id)
             ->whereBetween('created_at', [$fromDate, $toDate])
             ->groupBy(DB::raw('DATE(created_at)'))
             ->pluck('total', 'date')->toArray();
-    
-        // Fetch finished actions per day
+
+        // Fetch finished actions per day for the specific user
         $finishedActionsPerDay = Action::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
+            ->where('created_by', $user->id)
             ->where('Status', true)
             ->whereBetween('created_at', [$fromDate, $toDate])
             ->groupBy(DB::raw('DATE(created_at)'))
             ->pluck('total', 'date')->toArray();
-    
-        // Fetch not finished actions per day
+
+        // Fetch not finished actions per day for the specific user
         $notFinishedActionsPerDay = Action::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
+            ->where('created_by', $user->id)
             ->where('Status', false)
             ->whereBetween('created_at', [$fromDate, $toDate])
             ->groupBy(DB::raw('DATE(created_at)'))
             ->pluck('total', 'date')->toArray();
-    
-        // Fetch patients per day
+
+        // Fetch patients per day for the specific user
         $patientsPerDay = Patient::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
+            ->where('created_by', $user->id)
             ->whereBetween('created_at', [$fromDate, $toDate])
             ->groupBy(DB::raw('DATE(created_at)'))
             ->pluck('total', 'date')->toArray();
-    
+
         // Merge with all dates to ensure all days are represented
         $patientsPerDay = array_merge(array_fill_keys($allDates, 0), $patientsPerDay);
         $actionsPerDay = array_merge(array_fill_keys($allDates, 0), $actionsPerDay);
         $finishedActionsPerDay = array_merge(array_fill_keys($allDates, 0), $finishedActionsPerDay);
         $notFinishedActionsPerDay = array_merge(array_fill_keys($allDates, 0), $notFinishedActionsPerDay);
-    
+
         return inertia('UsersManagement/Edit', [
             'user' => $user,
             'patientsPerDay' => $patientsPerDay,
@@ -141,7 +145,7 @@ class UsersController extends Controller
             'notFinishedActionsPerDay' => $notFinishedActionsPerDay,
         ]);
     }
-    
+
 
     /**
      * Update the specified resource in storage.
