@@ -8,7 +8,7 @@ import ActionsByStatusPieChart from "./Components/ActionsStatus";
 import PaymentsByActionTypeChart from "./Components/ActionPayments";
 import DailyCountsLineChart from '../Components/MonthlyChart';
 
-export default function Index({ auth, male_count, female_count, actionTypeCounts, actionsByStatus, paymentsByActionType, paymentsPerDay }) {
+export default function Index({ auth, male_count, female_count, actionTypeCounts, actionsByStatus, paymentsByActionType, paymentsPerDay, actionsPerDay,finishedActionsPerDay, notFinishedActionsPerDay, patientsPerDay }) {
     const [fromDate, setFromDate] = useState('');
     const [toDate, setToDate] = useState('');
 
@@ -62,7 +62,7 @@ export default function Index({ auth, male_count, female_count, actionTypeCounts
                         <PaymentsByActionTypeChart paymentsByActionType={paymentsByActionType} />
                     </div>
                     <div className='col-span-3 min-w-full'>
-                        <DailyCountsLineChart patientsPerDay={paymentsPerDay} />
+                        <DailyCountsLineChart patientsPerDay={patientsPerDay} actionsPerDay={actionsPerDay} finishedActionsPerDay={finishedActionsPerDay} notFinishedActionsPerDay={notFinishedActionsPerDay} />
                     </div>
                 </div>
             </section>
