@@ -14,7 +14,7 @@ class ActionController extends Controller
      */
     public function index()
     {
-        // Implement logic to list actions if needed
+        // Implement logic to list actions if needed 
     }
 
     /**

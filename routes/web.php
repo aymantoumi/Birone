@@ -8,6 +8,7 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Settings;
 use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -23,6 +24,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('Statistics', StatisticsController::class);
     Route::resource('actionType', ActionsTypeController::class);
     Route::get('/settings', [Settings::class, 'index'])->name('settings.index');
+    Route::resource('usersManagement', UsersController::class);
 });
 
 Route::middleware('auth')->group(function () {

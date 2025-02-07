@@ -67,6 +67,39 @@ class StatisticsController extends Controller
         // Merge with all dates to ensure all days are represented
         $paymentsPerDay = array_merge(array_fill_keys($allDates, 0), $paymentsPerDay);
 
+        // Fetch actions per day
+        $actionsPerDay = Action::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
+            ->whereBetween('created_at', [$fromDate, $toDate])
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->pluck('total', 'date')->toArray();
+
+        // Fetch finished actions per day
+        $finishedActionsPerDay = Action::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
+            ->where('Status', true)
+            ->whereBetween('created_at', [$fromDate, $toDate])
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->pluck('total', 'date')->toArray();
+
+        // Fetch not finished actions per day
+        $notFinishedActionsPerDay = Action::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
+            ->where('Status', false)
+            ->whereBetween('created_at', [$fromDate, $toDate])
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->pluck('total', 'date')->toArray();
+
+        // Fetch patients per day
+        $patientsPerDay = Patient::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
+            ->whereBetween('created_at', [$fromDate, $toDate])
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->pluck('total', 'date')->toArray();
+
+        // Merge with all dates to ensure all days are represented
+        $patientsPerDay = array_merge(array_fill_keys($allDates, 0), $patientsPerDay);
+        $actionsPerDay = array_merge(array_fill_keys($allDates, 0), $actionsPerDay);
+        $finishedActionsPerDay = array_merge(array_fill_keys($allDates, 0), $finishedActionsPerDay);
+        $notFinishedActionsPerDay = array_merge(array_fill_keys($allDates, 0), $notFinishedActionsPerDay);
+
+
         return inertia('Statistics/Index', [
             'male_count' => $male_count,
             'female_count' => $female_count,
@@ -74,6 +107,10 @@ class StatisticsController extends Controller
             'actionsByStatus' => $actionsByStatus,
             'paymentsByActionType' => $paymentsByActionType,
             'paymentsPerDay' => $paymentsPerDay,
+            'patientsPerDay' => $patientsPerDay,
+            'actionsPerDay' => $actionsPerDay,
+            'finishedActionsPerDay' => $finishedActionsPerDay,
+            'notFinishedActionsPerDay' => $notFinishedActionsPerDay,
         ]);
     }
 
