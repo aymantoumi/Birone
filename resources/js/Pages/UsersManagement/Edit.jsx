@@ -1,9 +1,9 @@
 import UsersLayout from "@/Layouts/Users";
-import { Head, useForm } from "@inertiajs/react";
+import { Head, useForm, router } from "@inertiajs/react";
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
-import DangerButton from '@/Components/DangerButton'; // Assuming you have a DangerButton component
+import DangerButton from '@/Components/DangerButton'; 
 import TextInput from '@/Components/TextInput';
 import DailyCountsLineChart from "./Components/PerformanceChafrt";
 import { useState } from "react";
