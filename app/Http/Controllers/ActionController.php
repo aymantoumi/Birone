@@ -33,7 +33,6 @@ class ActionController extends Controller
         // Validate incoming data
         $validatedData = $request->validate([
             'Action' => 'required|integer|exists:actions_types,id', // Ensure Action is a valid action type ID
-            'Payment' => 'nullable|numeric',
         ]);
     
         // Prepare the data for the actions table
@@ -119,7 +118,6 @@ class ActionController extends Controller
         // Validate the incoming request data
         $validatedData = $request->validate([
             'actions_types_id' => 'required|integer|exists:actions_types,id', // Ensure the action type ID is valid
-            'payment' => 'required|numeric', // Ensure payment is a numeric value
         ]);
     
         // Find the action by its ID or fail if not found

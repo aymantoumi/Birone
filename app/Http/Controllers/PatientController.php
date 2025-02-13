@@ -82,11 +82,8 @@ class PatientController extends Controller
         $validatedData = $request->validate([
             'first_name' => 'required|string|max:20',
             'last_name' => 'required|string|max:20',
-            'cin' => 'nullable|string',
             'category_id' => 'required|integer|max:20',
             'gender' => 'required|string|max:20',
-            'phone' => 'nullable|digits:10',
-            'birth_date' => 'nullable|date',
         ]);
         $validatedData['created_by'] = auth()->id();
 
@@ -138,10 +135,7 @@ class PatientController extends Controller
         $validatedData = $request->validate([
             'first_name' => 'required|string|max:20',
             'last_name' => 'required|string|max:20',
-            'cin' => 'nullable|string',
-            'birth_date' => 'nullable|date',
             'gender' => 'required|string|max:20',
-            'phone' => 'nullable|digits:10',
             'category_id' => 'nullable|exists:categories,id', 
         ]);
     
