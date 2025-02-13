@@ -13,7 +13,7 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
         cin: patient.cin || "",
         gender: patient.gender || "",
         phone: patient.phone || "",
-        category_id: patient.category_id || "",  // Add category_id here
+        category_id: patient.category_id || "", 
         _method: "PUT",
     });
 
@@ -198,60 +198,65 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                         <Pagination links={actions.links} />
                     </div>
                 </div>
-                <div className="dark:bg-gray-800 bg-sky-100 py-8 px-24 rounded-lg grid  lg:grid-cols-2 grid-cols-1 gap-4">
-                    <div className="dark:bg-gray-900 bg-zinc-300 rounded-lg py-4 px-10">
-                        <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
-                            <h1 className="font-extrabold dark:text-stone-500 text-lg">
-                                Past Medical Conditions :
-                            </h1>
-                            <span className="font-bold dark:text-gray-200"> Patient</span>
-                        </div>
-                        <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
-                            <h1 className="font-extrabold dark:text-stone-500 text-lg">
-                                Past Surgeries :
-                            </h1>
-                            <span className="font-bold dark:text-gray-200"> Patient</span>
-                        </div>
-                        <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
-                            <h1 className="font-extrabold dark:text-stone-500 text-lg">
-                                Family Medical History  :
-                            </h1>
-                            <span className="font-bold dark:text-gray-200"> Patient</span>
-                        </div>
-                        <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
-                            <h1 className="font-extrabold dark:text-stone-500 text-lg">
-                                Smoking Status :
-                            </h1>
-                            <span className="font-bold dark:text-gray-200"> Patient</span>
-                        </div>
-                        <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
-                            <h1 className="font-extrabold dark:text-stone-500 text-lg">
-                                Alcohol Consumption :
-                            </h1>
-                            <span className="font-bold dark:text-gray-200"> Patient</span>
-                        </div>
-                    </div>
-                    <div className="dark:bg-gray-900 bg-zinc-300 py-8 px-24 rounded-lg grid  lg:grid-cols-2 grid-cols-1 gap-4">
-                        <div className="flex items-center flex-wrap gap-2 min-w-fit ">
-                            <h1 className="font-extrabold dark:text-stone-500 text-lg">
-                                Allergies  :
-                            </h1>
-                            <ul className="flex flex-col gap-4">
-                                <li className="font-bold dark:text-gray-200"> Patient</li>
-                                <li className="font-bold dark:text-gray-200"> Patient</li>
-                            </ul>
-                        </div>
-                        <div className="flex items-center flex-wrap gap-2 min-w-fit">
-                            <h1 className="font-extrabold dark:text-stone-500 text-lg">
-                                Chronic Diseases :
-                            </h1>
-                            <ul className="flex flex-col gap-4">
-                                <li className="font-bold dark:text-gray-200"> Patient</li>
-                                <li className="font-bold dark:text-gray-200"> Patient</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+                {auth.user.role === 'admin' && (
+                        <>
+                            <div className="dark:bg-gray-800 bg-sky-100 py-8 px-24 rounded-lg grid  lg:grid-cols-2 grid-cols-1 gap-4">
+                                <div className="dark:bg-gray-900 bg-zinc-300 rounded-lg py-4 px-10">
+                                    <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
+                                        <h1 className="font-extrabold dark:text-stone-500 text-lg">
+                                            Past Medical Conditions :
+                                        </h1>
+                                        <span className="font-bold dark:text-gray-200"> Patient</span>
+                                    </div>
+                                    <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
+                                        <h1 className="font-extrabold dark:text-stone-500 text-lg">
+                                            Past Surgeries :
+                                        </h1>
+                                        <span className="font-bold dark:text-gray-200"> Patient</span>
+                                    </div>
+                                    <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
+                                        <h1 className="font-extrabold dark:text-stone-500 text-lg">
+                                            Family Medical History  :
+                                        </h1>
+                                        <span className="font-bold dark:text-gray-200"> Patient</span>
+                                    </div>
+                                    <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
+                                        <h1 className="font-extrabold dark:text-stone-500 text-lg">
+                                            Smoking Status :
+                                        </h1>
+                                        <span className="font-bold dark:text-gray-200"> Patient</span>
+                                    </div>
+                                    <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
+                                        <h1 className="font-extrabold dark:text-stone-500 text-lg">
+                                            Alcohol Consumption :
+                                        </h1>
+                                        <span className="font-bold dark:text-gray-200"> Patient</span>
+                                    </div>
+                                </div>
+                                <div className="dark:bg-gray-900 bg-zinc-300 py-8 px-24 rounded-lg grid  lg:grid-cols-2 grid-cols-1 gap-4">
+                                    <div className="flex items-center flex-wrap gap-2 min-w-fit ">
+                                        <h1 className="font-extrabold dark:text-stone-500 text-lg">
+                                            Allergies  :
+                                        </h1>
+                                        <ul className="flex flex-col gap-4">
+                                            <li className="font-bold dark:text-gray-200"> Patient</li>
+                                            <li className="font-bold dark:text-gray-200"> Patient</li>
+                                        </ul>
+                                    </div>
+                                    <div className="flex items-center flex-wrap gap-2 min-w-fit">
+                                        <h1 className="font-extrabold dark:text-stone-500 text-lg">
+                                            Chronic Diseases :
+                                        </h1>
+                                        <ul className="flex flex-col gap-4">
+                                            <li className="font-bold dark:text-gray-200"> Patient</li>
+                                            <li className="font-bold dark:text-gray-200"> Patient</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )
+                }
             </section>
 
             {/* Update Modal */}

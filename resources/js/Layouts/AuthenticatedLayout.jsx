@@ -6,7 +6,7 @@ import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link } from '@inertiajs/react';
 
 export default function Authenticated({ user, header, children }) {
-    
+
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
 
     return (
@@ -28,15 +28,19 @@ export default function Authenticated({ user, header, children }) {
                                 <NavLink href={route('Patients.index')} active={route().current('Patients.index')}>
                                     Patients
                                 </NavLink>
-                                <NavLink href={route('Statistics.index')} active={route().current('Statistics.index')}>
-                                    Statistics
-                                </NavLink>
-                                <NavLink href={route('settings.index')} active={route().current('settings.index')}>
-                                    Settings
-                                </NavLink>
-                                <NavLink href={route('usersManagement.index')} active={route().current('usersManagement.index')}>
-                                    Users Management
-                                </NavLink>
+                                {user.role === 'admin' && (
+                                    <>
+                                        <NavLink href={route('Statistics.index')} active={route().current('Statistics.index')}>
+                                            Statistics
+                                        </NavLink>
+                                        <NavLink href={route('settings.index')} active={route().current('settings.index')}>
+                                            Settings
+                                        </NavLink>
+                                        <NavLink href={route('usersManagement.index')} active={route().current('usersManagement.index')}>
+                                            Users Management
+                                        </NavLink>
+                                    </>
+                                )}
                             </div>
                         </div>
 
