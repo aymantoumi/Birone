@@ -150,22 +150,35 @@ class UsersController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $userId)
     {
-        $user = User::findOrFail($id);
-
+        // Validate the incoming request data
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($userId)],
             'role' => 'required|string',
         ]);
 
+        // Find the user by ID
+        $user = User::findOrFail($userId);
+
+        // Assign validated data to the user model
+        $user->name = $validatedData['name'];
+        $user->email = $validatedData['email'];
+        $user->role = $validatedData['role'];
+
+        // Update the password only if it's provided in the request
         if ($request->filled('password')) {
-            $validatedData['password'] = Hash::make($request->password);
+            $user->password = Hash::make($request->password);
         }
 
-        $user->update($validatedData);
+        // Optionally, track who updated the user (if applicable)
+        $user->updated_by = auth()->id();
 
+        // Save the changes to the database
+        $user->save();
+
+        // Redirect back with a success message
         return redirect()->route('usersManagement.index')->with('success', 'User updated successfully.');
     }
 
