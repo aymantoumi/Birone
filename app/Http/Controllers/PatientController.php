@@ -64,7 +64,7 @@ class PatientController extends Controller
         $categories = Category::orderBy('created_at', 'desc')->get();
 
         return inertia('Patients/Registeration', [
-            'total_count' => Patient::count(),
+            'total_count' => Patient::whereDate('created_at', $today)->count(),
             'waiting' => Action::whereDate('created_at', $today)->where('Status', false)->count(),
             'done' => Action::whereDate('created_at', $today)->where('Status', true)->count(),
             'actionsWaiting' => ActionResource::collection($actionsWaiting),
@@ -82,9 +82,13 @@ class PatientController extends Controller
         $validatedData = $request->validate([
             'first_name' => 'required|string|max:20',
             'last_name' => 'required|string|max:20',
+            'cin' => 'nullable|string',
             'category_id' => 'required|integer|max:20',
             'gender' => 'required|string|max:20',
+            'phone' => 'nullable|digits:10',
+            'birth_date' => 'nullable|date',
         ]);
+
         $validatedData['created_by'] = auth()->id();
 
         $patient = new Patient($validatedData);
@@ -134,9 +138,12 @@ class PatientController extends Controller
     {
         $validatedData = $request->validate([
             'first_name' => 'required|string|max:20',
-            'last_name' => 'required|string|max:20',
-            'gender' => 'required|string|max:20',
+            'last_name' => 'required|string|max:20', 
+            'gender' => 'required|string|in:male,female,other',
             'category_id' => 'nullable|exists:categories,id', 
+            'birth_date' => 'nullable|date|before_or_equal:today', 
+            'cin' => 'nullable|string|min:6|max:15|unique:patients,cin,' ,
+            'phone' => 'nullable|string|min:8|max:15|unique:patients,phone,' , 
         ]);
     
         $patient = Patient::findOrFail($patientId);
