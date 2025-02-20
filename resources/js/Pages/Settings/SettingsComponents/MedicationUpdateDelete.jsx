@@ -1,10 +1,10 @@
 import Modal from '@/Components/Modal';
 import { useForm } from '@inertiajs/react';
 
-export default function MedicationUpdateDelete({ medication, onClose, onDeleteSuccess }) {
-    const { data, setData, put, delete: destroy, processing, errors, reset } = useForm({
-        medication_name: medication.medication_name,
-        medication_class: medication.medication_class_id,
+export default function MedicationUpdateDelete({ medication, medicationClasses = { data: [] }, onClose, onDeleteSuccess }) {
+    const { data, setData, put, destroy, processing, errors, reset } = useForm({
+        medication: medication.medication, // Match backend field name
+        medication_class_id: medication.medication_class_id, // Match backend field name
     });
 
     const handleDelete = () => {
@@ -26,8 +26,8 @@ export default function MedicationUpdateDelete({ medication, onClose, onDeleteSu
                 reset();
                 onClose();
             },
-            onError: () => {
-                console.error('Error updating medication');
+            onError: (errors) => {
+                console.error('Validation errors:', errors);
             },
         });
     };
@@ -39,43 +39,43 @@ export default function MedicationUpdateDelete({ medication, onClose, onDeleteSu
 
                 {/* Update Medication Name */}
                 <div className="flex justify-between gap-2 items-center">
-                    <label htmlFor="medication_name" className="font-extrabold">
+                    <label htmlFor="medication" className="font-extrabold">
                         Medication Name
                     </label>
                     <input
                         type="text"
-                        name="medication_name"
-                        id="medication_name"
+                        name="medication"
+                        id="medication"
                         className="font-bold rounded-xl w-full"
-                        value={data.medication_name}
-                        onChange={(e) => setData('medication_name', e.target.value)}
+                        value={data.medication}
+                        onChange={(e) => setData('medication', e.target.value)}
                     />
-                    {errors.medication_name && (
-                        <span className="text-red-500">{errors.medication_name}</span>
-                    )}
+                    {errors.medication && <span className="text-red-500">{errors.medication}</span>}
                 </div>
 
                 {/* Update Medication Class */}
                 <div className="flex justify-between gap-2 items-center">
-                    <label htmlFor="medication_class" className="font-extrabold">
+                    <label htmlFor="medication_class_id" className="font-extrabold">
                         Medication Class
                     </label>
                     <select
-                        name="medication_class"
-                        id="medication_class"
+                        name="medication_class_id"
+                        id="medication_class_id"
                         className="font-bold rounded-xl w-full"
-                        value={data.medication_class}
-                        onChange={(e) => setData('medication_class', e.target.value)}
+                        value={data.medication_class_id}
+                        onChange={(e) => setData('medication_class_id', e.target.value)}
                     >
-                        {medication.medication_classes.map((medClass) => (
-                            <option key={medClass.id} value={medClass.id}>
-                                {medClass.medication_class}
-                            </option>
-                        ))}
+                        {medicationClasses.data.length > 0 ? (
+                            medicationClasses.data.map((medClass) => (
+                                <option key={medClass.id} value={medClass.id}>
+                                    {medClass.medication_class}
+                                </option>
+                            ))
+                        ) : (
+                            <option value="">No medication classes available</option>
+                        )}
                     </select>
-                    {errors.medication_class && (
-                        <span className="text-red-500">{errors.medication_class}</span>
-                    )}
+                    {errors.medication_class_id && <span className="text-red-500">{errors.medication_class_id}</span>}
                 </div>
 
                 {/* Delete Medication */}
@@ -87,7 +87,6 @@ export default function MedicationUpdateDelete({ medication, onClose, onDeleteSu
                     >
                         Delete Medication
                     </button>
-
                     {/* Update Button */}
                     <button
                         type="submit"

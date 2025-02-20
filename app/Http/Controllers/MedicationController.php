@@ -59,16 +59,34 @@ class MedicationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Medication $medication)
+    public function update(Request $request, string $medicationId)
     {
-        //
+        $validatedData = $request->validate([
+            'medication' => 'required|string|max:255',
+            'medication_class_id' => 'required|exists:medication_classes,id',
+        ]);
+
+        $medication = Medication::findOrFail($medicationId);
+        $medication->medication = $validatedData['medication'];
+        $medication->medication_class_id = $validatedData['medication_class_id'];
+
+        $medication->save();
+
+        return back()->with('success', 'Medication updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Medication $medication)
+    public function destroy($id)
     {
-        //
+        $medication = Medication::find($id);
+
+        if ($medication) {
+            $medication->delete();
+            return back()->with('success', 'Medication deleted successfully!');
+        } else {
+            return back()->with('error', 'Medication not found.');
+        }
     }
 }

@@ -12,14 +12,19 @@ import LabResults from './SettingsComponents/LabResults';
 import LabResultUpdateDelete from './SettingsComponents/LabResultUpdateDelete';
 import Scans from './SettingsComponents/Scans';
 import ScannerUpdateDelete from './SettingsComponents/ScannerUpdateDelete';
-import Medication from './SettingsComponents/Medication'; // Import the Medication component
+import Medication from './SettingsComponents/Medication';
+import MedicationUpdateDelete from './SettingsComponents/MedicationUpdateDelete';
 
-export default function Index({ auth, actionsType, categories, medication_classes, lab_results, scanners }) {
+export default function Index({ auth, actionsType, categories, medication_classes, lab_results, scanners, medications }) {
     const [selectedAction, setSelectedAction] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedMedicationClass, setSelectedMedicationClass] = useState(null);
     const [selectedLabResult, setSelectedLabResult] = useState(null);
     const [selectedScanner, setSelectedScanner] = useState(null);
+    const [selectedMedication, setSelectedMedication] = useState(null);
+
+    console.log(medications);
+
 
     const handleActionClick = (action) => {
         setSelectedAction(action);
@@ -37,6 +42,10 @@ export default function Index({ auth, actionsType, categories, medication_classe
         setSelectedScanner(scanner);
     };
 
+    const handleMedicationClick = (medication) => {
+        setSelectedMedication(medication);
+    };
+
     const closeActionModal = () => {
         setSelectedAction(null);
     };
@@ -47,6 +56,10 @@ export default function Index({ auth, actionsType, categories, medication_classe
 
     const closeMedicationClassModal = () => {
         setSelectedMedicationClass(null);
+    };
+
+    const closeMedicationModal = () => {
+        setSelectedMedication(null);
     };
 
     const handleLabResultsClick = (labResult) => {
@@ -187,7 +200,31 @@ export default function Index({ auth, actionsType, categories, medication_classe
                 {/* Medication Form */}
                 <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-gray-700 bg-sky-400">
                     <h1 className="dark:text-amber-950 text-2xl font-extrabold">Add Medication</h1>
-                    <Medication medicationClass={medication_classes} />
+                    <div className="flex flex-col gap-5 ">
+                        <Medication medicationClass={medication_classes} />
+                        <div className="flex-1 min-w-[8em] min-h-[6em] bg-stone-400 rounded-xl px-6 py-4">
+                            {medications && medications.data && medications.data.length > 0 ? (
+                                medications.data.map((medication) => (
+                                    <div
+                                        key={medication.id}
+                                        className="bg-white p-4 mb-2 rounded-lg shadow-sm cursor-pointer"
+                                        onClick={() => handleMedicationClick(medication)}
+                                    >
+                                        <div>
+                                            <h3 className="font-bold text-lg text-gray-800">{medication.medication}</h3>
+                                            <p className="text-sm text-gray-500">
+                                                Created At: {new Date(medication.created_at).toLocaleString()}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-gray-600 p-4">No medication available.</p>
+                            )
+                            }
+                            <Pagination links={medications.links} />
+                        </div>
+                    </div>
                 </div>
 
                 <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-gray-700 bg-sky-400">
@@ -242,9 +279,17 @@ export default function Index({ auth, actionsType, categories, medication_classe
                 />
             )}
             {selectedScanner && (
-                <ScannerUpdateDelete 
+                <ScannerUpdateDelete
                     scanner={selectedScanner}
                     onClose={closeScannerModal}
+                />
+            )}
+            {selectedMedication && (
+                <MedicationUpdateDelete
+                    medication={selectedMedication}
+                    medicationClasses={medication_classes} // Ensure this prop is passed correctly
+                    onClose={closeMedicationModal}
+                    onDeleteSuccess={closeMedicationModal}
                 />
             )}
         </Settings>

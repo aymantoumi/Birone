@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class ActionsType extends Model
 {
-    use HasFactory;
+    protected $table = 'actions_types';
+    protected $fillable = [
+        'type_name',
+    ];
 
-    protected $fillable = ['action'];
 
     public function actions()
     {
