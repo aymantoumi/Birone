@@ -4,8 +4,12 @@ use App\Http\Controllers\ActionController;
 use App\Http\Controllers\ActionsTypeController;
 use App\Http\Controllers\categories;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LabResultController;
+use App\Http\Controllers\MedicationClassController;
+use App\Http\Controllers\MedicationController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ScannerController;
 use App\Http\Controllers\Settings;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\UsersController;
@@ -22,6 +26,10 @@ Route::middleware(['auth', 'verified', 'administrator:admin'])->group(function (
     Route::resource('actionType', ActionsTypeController::class);
     Route::get('/settings', [Settings::class, 'index'])->name('settings.index');
     Route::resource('usersManagement', UsersController::class);
+    Route::resource('medicationClass', MedicationClassController::class);
+    Route::resource('lab_results', LabResultController::class);
+    Route::resource('scans', ScannerController::class);
+    Route::resource('medications', MedicationController::class);
 });
 
 Route::middleware(['auth', 'verified', ])->group(function () {

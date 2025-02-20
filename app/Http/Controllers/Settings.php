@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\ActionsType;
 use App\Models\Category;
+use App\Models\LabResult;
+use App\Models\MedicationClass;
+use App\Models\Scanner;
 use Illuminate\Http\Request;
 
 class Settings extends Controller
@@ -13,9 +16,15 @@ class Settings extends Controller
         $query = ActionsType::query();
         $categories = Category::orderBy('created_at', 'desc')->paginate(5);
         $actionsType = $query->orderBy('created_at', 'desc')->paginate(5);
+        $medication_classes = MedicationClass::orderBy('created_at', 'desc')->paginate(5);
+        $lab_results = LabResult::orderBy('created_at', 'desc')->paginate(5);
+        $scanners = Scanner::orderBy('created_at', 'desc')->paginate(5);
         return inertia('Settings/Index', [
             'actionsType' => $actionsType,
             'categories' => $categories,
+            'medication_classes' => $medication_classes,
+            'lab_results' => $lab_results,
+            'scanners' => $scanners,
         ]);
     }
 }

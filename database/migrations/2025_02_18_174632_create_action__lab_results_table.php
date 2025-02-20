@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('results', function (Blueprint $table) {
+        Schema::create('action__lab_results', function (Blueprint $table) {
             $table->id();
-            $table->string('results');
-            $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null')->onUpdate('cascade');
-            $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null')->onUpdate('cascade');
             $table->timestamps();
         });
     }
@@ -25,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('results');
+        Schema::dropIfExists('action__lab_results');
     }
 };

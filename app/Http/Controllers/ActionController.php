@@ -32,7 +32,7 @@ class ActionController extends Controller
     {
         // Validate incoming data
         $validatedData = $request->validate([
-            'Action' => 'required|integer|exists:actions_types,id', // Ensure Action is a valid action type ID
+            'Action' => 'required|integer|exists:actions_types,id', 
         ]);
     
         // Prepare the data for the actions table
