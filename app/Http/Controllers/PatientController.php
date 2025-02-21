@@ -7,7 +7,9 @@ use App\Http\Resources\PatientsResource;
 use App\Models\action;
 use App\Models\ActionsType;
 use App\Models\Category;
+use App\Models\Medication;
 use App\Models\Patient;
+use App\Models\Scanner;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -109,17 +111,19 @@ class PatientController extends Controller
             ->with(['actionType'])  // Ensure the actionType is loaded
             ->paginate(5);
 
-        // Get all actions types for dropdown or selection, as needed
         $actionsTypes = ActionsType::all();
-
-        // Get all categories
+        $medications = Medication::all();
         $categories = Category::all();
+        $scanners = Scanner::all();
 
         return Inertia::render('Patients/Patient', [
             'patient' => $patient,
             'actions' => $actions,
             'actionsTypes' => $actionsTypes,
-            'categories' => $categories,  
+            'categories' => $categories,
+            'medications' => $medications,
+            'scanners' => $scanners
+
         ]);
     }
 
@@ -142,8 +146,8 @@ class PatientController extends Controller
             'gender' => 'required|string|in:male,female,other',
             'category_id' => 'nullable|exists:categories,id', 
             'birth_date' => 'nullable|date|before_or_equal:today', 
-            'cin' => 'nullable|string|min:6|max:15|unique:patients,cin,' ,
-            'phone' => 'nullable|string|min:8|max:15|unique:patients,phone,' , 
+            'cin' => 'nullable|string|min:6|max:15|unique:patients,cin,' . $patientId,
+            'phone' => 'nullable|string|min:8|max:15|unique:patients,phone,' . $patientId, 
         ]);
     
         $patient = Patient::findOrFail($patientId);
@@ -160,7 +164,7 @@ class PatientController extends Controller
         $patient->save();
     
         return back()->with('success', 'Patient updated successfully.');
-    }    
+    }      
     /**
      * Remove the specified resource from storage.
      */

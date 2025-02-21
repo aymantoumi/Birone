@@ -1,34 +1,39 @@
-import { useForm } from "@inertiajs/react";
+import { useForm } from "@inertiajs/react"
 
-export default function MedicationClasses() {
+export default function LabResults() {
+
     const { data, setData, post, processing, errors, reset } = useForm({
-        medication_class: '',
-    });
+        lab_results: ''
+    })
 
     function submitForm(e) {
+
         e.preventDefault();
-        post(route('medicationClass.store'), {
+        post(route('lab_results.store'), {
             onSuccess: () => reset(),
         });
     }
-
     return (
         <form
             onSubmit={submitForm}
+            method="post"
             className="flex flex-col flex-1 gap-4 min-w-[8em] min-h-[6em] px-8 py-4 bg-stone-400 rounded-xl"
+
         >
-            <label htmlFor="medication_class">Medication Class</label>
+            <label htmlFor="lab_results">Lab Results</label>
             <input
                 type="text"
-                name="medication_class"
-                id="medication_class"
+                name="lab_results"
+                id="lab_results"
                 className="max-w-96 rounded-lg"
-                value={data.medication_class}
-                onChange={(e) => setData('medication_class', e.target.value)}
+                value={data.lab_results}
+                onChange={(e) => setData('lab_results', e.target.value)}
             />
-            {errors.medication_class && (
-                <span className="text-red-500">{errors.medication_class}</span>
-            )}
+            {
+                errors.lab_results && (
+                    <span className="text-red-500"> {errors.lab_results} </span>
+                )
+            }
             <button
                 type="submit"
                 className="dark:bg-green-400 dark:text-green-950 max-w-fit py-2 px-6 rounded-xl font-extrabold hover:bg-green-700 hover:scale-110 bg-emerald-500 transition-all"
@@ -37,5 +42,5 @@ export default function MedicationClasses() {
                 {processing ? 'Adding ...' : 'Add'}
             </button>
         </form>
-    );
+    )
 }

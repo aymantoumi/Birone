@@ -21,6 +21,7 @@ class Patient extends Model
         'updated_by',
     ];    
 
+    // Relationships
     public function category()
     {
         return $this->belongsTo(Category::class);
