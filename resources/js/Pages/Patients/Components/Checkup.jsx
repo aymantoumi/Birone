@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from 'axios';
 
-export default function Checkup({ medications = [], labResults = [], scanners = [] }) {
+export default function Checkup({ medications = [], labResults = [], scanners = [], lastAction }) {
     const [medicationInputs, setMedicationInputs] = useState([{ searchQuery: "", selectedMedication: null }]);
     const [labResultInputs, setLabResultInputs] = useState([{ searchQuery: "", selectedResult: null }]);
     const [scannerInputs, setScannerInputs] = useState([{ searchQuery: "", selectedScanner: null }]);
@@ -73,16 +73,17 @@ export default function Checkup({ medications = [], labResults = [], scanners = 
     };
 
     return (
-        <div className="w-full bg-white rounded-lg shadow-lg p-6">
-            <h1 className="text-2xl font-bold mb-4">Checkup Form</h1>
+        <div className=" space-y-4 dark:bg-gray-900 bg-white rounded-lg shadow-lg p-6">
+            <h1 className="text-2xl font-extrabold dark:text-gray-50">Checkup Form</h1>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className="grid gap-5">
+                <input type="hidden" name="lastAction" value={lastAction} />
                 {/* Dynamic Input Fields for Medications */}
-                <div className="flex justify-between gap-[5rem]">
+                <div className="flex flex-wrap justify-between gap-[5rem]">
                     <div className="min-w-[18em] flex-1">
                         {medicationInputs.map((input, index) => (
-                            <div key={index} className="mb-4 border rounded-lg p-2 shadow-sm">
-                                <label htmlFor={`medication_select_${index}`} className="font-bold block mb-1">
+                            <div key={index} className="mb-4 border rounded-lg p-2 shadow-sm dark:bg-gray-50">
+                                <label  htmlFor={`medication_select_${index}`} className="font-bold block mb-1 ">
                                     Select Medication {index + 1}
                                 </label>
                                 <div className="relative">
@@ -139,7 +140,7 @@ export default function Checkup({ medications = [], labResults = [], scanners = 
                         <button
                             type="button"
                             onClick={() => handleAddInput(setMedicationInputs)}
-                            className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 w-full mb-4"
+                            className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 w-fit"
                         >
                             Add New Medication
                         </button>
@@ -147,7 +148,7 @@ export default function Checkup({ medications = [], labResults = [], scanners = 
                     <div className="min-w-[18em] flex-1">
                         {/* Dynamic Input Fields for Lab Results */}
                         {labResultInputs.map((input, index) => (
-                            <div key={index} className="mb-4 border rounded-lg p-2 shadow-sm">
+                            <div key={index} className="mb-4 border rounded-lg p-2 shadow-sm dark:bg-gray-50">
                                 <label htmlFor={`lab_result_select_${index}`} className="font-bold block mb-1">
                                     Select Lab Result {index + 1}
                                 </label>
@@ -203,7 +204,7 @@ export default function Checkup({ medications = [], labResults = [], scanners = 
                         <button
                             type="button"
                             onClick={() => handleAddInput(setLabResultInputs)}
-                            className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 w-full mb-4"
+                            className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 w-fit"
                         >
                             Add New Lab Result
                         </button>
@@ -211,7 +212,7 @@ export default function Checkup({ medications = [], labResults = [], scanners = 
                     <div className="min-w-[18em] flex-1">
                         {/* Dynamic Input Fields for Scanners */}
                         {scannerInputs.map((input, index) => (
-                            <div key={index} className="mb-4 border rounded-lg p-2 shadow-sm">
+                            <div key={index} className="mb-4 border rounded-lg p-2 shadow-sm dark:bg-gray-50">
                                 <label htmlFor={`scanner_select_${index}`} className="font-bold block mb-1">
                                     Select Scanner {index + 1}
                                 </label>
@@ -267,7 +268,7 @@ export default function Checkup({ medications = [], labResults = [], scanners = 
                         <button
                             type="button"
                             onClick={() => handleAddInput(setScannerInputs)}
-                            className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 w-full mb-4"
+                            className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 w-fit"
                         >
                             Add New Scanner
                         </button>
@@ -277,7 +278,7 @@ export default function Checkup({ medications = [], labResults = [], scanners = 
 
 
                 {/* Result and Notes */}
-                <div className="mb-4">
+                <div className="dark:bg-gray-50 py-4 px-8 rounded-lg">
                     <label htmlFor="result" className="font-bold block mb-1">Result</label>
                     <textarea
                         id="result"
@@ -288,7 +289,7 @@ export default function Checkup({ medications = [], labResults = [], scanners = 
                     />
                 </div>
 
-                <div className="mb-4">
+                <div className="dark:bg-gray-50 py-4 px-8 rounded-lg">
                     <label htmlFor="notes" className="font-bold block mb-1">Notes</label>
                     <textarea
                         id="notes"

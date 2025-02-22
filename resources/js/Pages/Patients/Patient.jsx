@@ -66,6 +66,9 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
         setSelectedAction(null);
     };
 
+    const lastAction = actions.data[actions.data.length - 1].id
+    
+
     return (
         <PatientsLayout
             user={auth.user}
@@ -204,11 +207,12 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                     </div>
                 </div>
                 {auth.user.role === 'admin' && (
-                    <div className="dark:bg-gray-800 bg-sky-100 py-8 px-24 ">
+                    <div className="dark:bg-gray-800 bg-sky-100 py-8 px-24 rounded-lg grid ">
                         <Checkup 
                             labResults={lab_results}
                             medications={medications}
                             scanners={scanners}
+                            lastAction={lastAction}
                         />
                     </div>
                 )}
