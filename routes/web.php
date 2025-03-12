@@ -14,6 +14,7 @@ use App\Http\Controllers\Settings;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\CheckupController;
+use App\Http\Controllers\ActionScannersController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -32,6 +33,7 @@ Route::middleware(['auth', 'verified', 'administrator:admin'])->group(function (
     Route::resource('medications', MedicationController::class);
     Route::post('/checkups', [CheckupController::class, 'store'])->name('checkups.store');
     Route::put('/checkups/{actionId}', [CheckupController::class, 'update'])->name('checkups.update');
+    // Route::post('', [ActionScannersController::class, 'store'])->name('scans.store');
 });
 
 Route::middleware(['auth', 'verified',])->group(function () {

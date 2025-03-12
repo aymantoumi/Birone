@@ -18,6 +18,7 @@ class CheckupController extends Controller
      */
     public function store(Request $request)
     {
+        dd($request);
         // Begin database transaction
         DB::beginTransaction();
 

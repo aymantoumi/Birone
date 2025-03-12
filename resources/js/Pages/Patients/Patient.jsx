@@ -3,8 +3,10 @@ import PatientsLayout from "@/Layouts/PatientsLayout";
 import { Head, useForm } from "@inertiajs/react";
 import Pagination from "../Components/Pagination";
 import Update from './Update';
+import CTScans from './Components/CT_scans';
 
-export default function Patient({ auth, patient, actions, actionsTypes, categories, medications, scanners }) {
+export default function Patient({ auth, patient, actions, actionsTypes, categories, scanners }) {
+
     const { data, setData, put, processing, errors } = useForm({
         first_name: patient.first_name || "",
         last_name: patient.last_name || "",
@@ -19,10 +21,12 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
     const { data: actionData, setData: setActionData, post: postAction, processing: actionProcessing, errors: actionErrors } = useForm({
         action: '',
         payment: '',
-        medications: [],
-        scanners: [],
-        status: false,
     });
+
+    const action_id = actions.data[actions.data.length - 1].id
+
+    console.log(actions.data);
+
 
     const [selectedAction, setSelectedAction] = useState(null);
 
@@ -47,11 +51,8 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
         postAction(route('patients.actions.store', { patient: patient.id }), {
             onSuccess: () => {
                 setActionData({
-                    action: '',
-                    payment: '',
-                    medications: [],
-                    scanners: [],
-                    status: false,
+                    Action: '',
+                    Payment: '',
                 });
             },
         });
@@ -65,6 +66,14 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
         setSelectedAction(null);
     };
 
+    const [selectedActionId, setSelectedActionId] = useState("");
+
+    const handleSelectChange = (event) => {
+        const selectedValue = event.target.value; 
+        setSelectedActionId(selectedValue); 
+        console.log("Selected Action ID:", selectedValue); 
+    };
+        
     return (
         <PatientsLayout
             user={auth.user}
@@ -151,36 +160,37 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                             <div className="flex justify-between gap-2 items-center">
                                 <label htmlFor="action" className="dark:text-stone-200 font-extrabold">Action </label>
                                 <select
-                                    name="action"
+                                    name="Action"
                                     id="action"
                                     className="font-bold rounded-xl w-1/2"
-                                    value={actionData.action}
-                                    onChange={handleActionChange('action')}
+                                    value={actionData.Action}  // Ensure this matches the selected action id
+                                    onChange={handleActionChange('Action')}
                                 >
-                                    <option value="" disabled>Select visit type</option>
+                                    <option value="" disabled selected>Select visit type</option>
                                     {actionsTypes.map((type, index) => (
                                         <option key={index} value={type.id}>{type.action}</option>
                                     ))}
                                 </select>
-                                {actionErrors.action && <span className="text-red-500">{actionErrors.action}</span>}
+
+                                {actionErrors.Action && <span className="text-red-500">{actionErrors.Action}</span>}
                             </div>
                             <div className="flex justify-between gap-2 items-center">
                                 <label htmlFor="price" className="dark:text-stone-200 font-extrabold">Price</label>
                                 <input
                                     type="number"
-                                    name="payment"
+                                    name="Payment"
                                     id="price"
                                     className="font-bold rounded-xl w-1/2"
-                                    value={actionData.payment}
-                                    onChange={handleActionChange('payment')}
+                                    value={actionData.Payment}
+                                    onChange={handleActionChange('Payment')}
                                 />
-                                {actionErrors.payment && <span className="text-red-500">{actionErrors.payment}</span>}
+                                {actionErrors.Payment && <span className="text-red-500">{actionErrors.Payment}</span>}
                             </div>
                             <div className="flex justify-evenly">
                                 <button type="reset" className="bg-yellow-300 ax-w-fit py-2 px-6 rounded-xl font-extrabold hover:bg-yellow-400 hover:scale-110 transition-all ">
                                     Cancel
                                 </button>
-                                <button type="submit" className="dark:bg-emerald-400 dark:text-green-950 max-w-fit py-2 px-6 rounded-xl font-extrabold hover:bg-green-700 hover:scale-110 bg-emerald-400  transition-all" disabled={actionProcessing}>
+                                <button type="submit" className="dark:bg-emerald-400 dark:text-green-950 max-w-fit py-2 px-6 rounded-xl font-extrabold hover:bg-green-700 hover:scale-110 bg-emerald-400  transition-all" disabled={processing}>
                                     Add
                                 </button>
                             </div>
@@ -203,109 +213,72 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                     </div>
                 </div>
                 {auth.user.role === 'admin' && (
-                    <div className="dark:bg-gray-800 bg-sky-100 py-8 px-24 rounded-lg grid lg:grid-cols-2 grid-cols-1 gap-4">
-                        <form
-                            className="2xl:col-span-2 bg-sky-600 dark:bg-gray-900 py-5 px-12 rounded-lg"
-                            onSubmit={submitActionForm}
-                            method="POST"
+                    <>
+                        <select
+                            className="rounded-xl w-[16rem]"
+                            name="action_id"
+                            id=""
+                            onChange={handleSelectChange} 
+                            value={selectedActionId} 
                         >
-                            <div className="flex flex-col gap-5">
-                                {/* Action Type */}
-                                <div className="flex justify-between items-center gap-2 min-w-fit">
-                                    <h1 className="font-extrabold dark:text-stone-500 text-lg">Action Type:</h1>
-                                    <select
-                                        className="font-bold rounded-xl"
-                                        value={actionData.action || ""}
-                                        onChange={handleActionChange("action")}
+                            <option value="" disabled selected hidden>
+                                Select an action
+                            </option>
+
+                            {actions.data.map((action, index) => {
+                                const formattedDate = new Date(action.created_at).toISOString().split("T")[0];
+                                const actionType = action.action_type?.action || "No action type";
+
+                                return (
+                                    <option
+                                        value={action.id}
+                                        key={index}
                                     >
-                                        <option value="">Select Visit Type</option>
-                                        {actionsTypes.map((type) => (
-                                            <option key={type.id} value={type.id}>
-                                                {type.action}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {actionErrors.action && <span className="text-red-500">{actionErrors.action}</span>}
+                                        {formattedDate} | {actionType}
+                                    </option>
+                                );
+                            })}
+                        </select>
+                        <div className="dark:bg-gray-800 bg-sky-100 py-8 px-24 rounded-lg grid  lg:grid-cols-2 grid-cols-1 gap-4">
+                            <div className="dark:bg-gray-900 bg-zinc-300 rounded-lg py-4 px-10">
+                                <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
+                                    <h1 className="font-extrabold dark:text-stone-500 text-lg">
+                                        Past Medical Conditions :
+                                    </h1>
+                                    <span className="font-bold dark:text-gray-200"> Patient</span>
                                 </div>
-
-                                {/* Payment */}
-                                <div className="flex justify-between items-center gap-2 min-w-fit">
-                                    <h1 className="font-extrabold dark:text-stone-500 text-lg">Payment:</h1>
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        className="font-bold rounded-xl"
-                                        value={actionData.payment || ""}
-                                        onChange={handleActionChange("payment")}
-                                    />
-                                    {actionErrors.payment && <span className="text-red-500">{actionErrors.payment}</span>}
+                                <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
+                                    <h1 className="font-extrabold dark:text-stone-500 text-lg">
+                                        Past Surgeries :
+                                    </h1>
+                                    <span className="font-bold dark:text-gray-200"> Patient</span>
                                 </div>
-
-                                {/* Medications (Multi-Select with Search) */}
-                                <div className="flex flex-col gap-2">
-                                    <h1 className="font-extrabold dark:text-stone-500 text-lg">Medications:</h1>
-                                    <select
-                                        multiple
-                                        className="font-bold rounded-xl h-32"
-                                        value={actionData.medications || []}
-                                        onChange={(e) => {
-                                            const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value);
-                                            setActionData({ ...actionData, medications: selectedOptions });
-                                        }}
-                                    >
-                                        {medications.map((medication) => (
-                                            <option key={medication.id} value={medication.id}>
-                                                {medication.medication}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {actionErrors.medications && <span className="text-red-500">{actionErrors.medications}</span>}
+                                <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
+                                    <h1 className="font-extrabold dark:text-stone-500 text-lg">
+                                        Family Medical History  :
+                                    </h1>
+                                    <span className="font-bold dark:text-gray-200"> Patient</span>
                                 </div>
-
-                                {/* Scanners (Multi-Select with Search) */}
-                                <div className="flex flex-col gap-2">
-                                    <h1 className="font-extrabold dark:text-stone-500 text-lg">Scanners:</h1>
-                                    <select
-                                        multiple
-                                        className="font-bold rounded-xl h-32"
-                                        value={actionData.scanners || []}
-                                        onChange={(e) => {
-                                            const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value);
-                                            setActionData({ ...actionData, scanners: selectedOptions });
-                                        }}
-                                    >
-                                        {scanners.map((scanner) => (
-                                            <option key={scanner.id} value={scanner.id}>
-                                                {scanner.scan}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {actionErrors.scanners && <span className="text-red-500">{actionErrors.scanners}</span>}
+                                <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
+                                    <h1 className="font-extrabold dark:text-stone-500 text-lg">
+                                        Smoking Status :
+                                    </h1>
+                                    <span className="font-bold dark:text-gray-200"> Patient</span>
                                 </div>
-
-                                {/* Status (Default to False) */}
-                                <div className="flex justify-between items-center gap-2 min-w-fit">
-                                    <h1 className="font-extrabold dark:text-stone-500 text-lg">Status:</h1>
-                                    <input
-                                        type="checkbox"
-                                        className="font-bold rounded-xl"
-                                        checked={actionData.status}
-                                        onChange={(e) => setActionData({ ...actionData, status: e.target.checked })}
-                                    />
+                                <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
+                                    <h1 className="font-extrabold dark:text-stone-500 text-lg">
+                                        Alcohol Consumption :
+                                    </h1>
+                                    <span className="font-bold dark:text-gray-200"> Patient</span>
                                 </div>
                             </div>
-
-                            {/* Submit Button */}
-                            <button
-                                type="submit"
-                                className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-lg mt-4"
-                                disabled={actionProcessing}
-                            >
-                                {actionProcessing ? "Submitting..." : "Submit"}
-                            </button>
-                        </form>
-                    </div>
-                )}
+                            <div className="dark:bg-gray-900 bg-zinc-300 py-8 px-24 rounded-lg ">
+                                <CTScans scans={scanners} action_id={selectedActionId} />
+                            </div>
+                        </div>
+                    </>
+                )
+                }
             </section>
 
             {/* Update Modal */}

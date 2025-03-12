@@ -7,6 +7,7 @@ use App\Http\Resources\PatientsResource;
 use App\Models\action;
 use App\Models\ActionsType;
 use App\Models\Category;
+use App\Models\LabResult;
 use App\Models\Medication;
 use App\Models\Patient;
 use App\Models\Scanner;
@@ -115,6 +116,7 @@ class PatientController extends Controller
         $medications = Medication::all();
         $categories = Category::all();
         $scanners = Scanner::all();
+        $lab_results = LabResult::all();
 
         return Inertia::render('Patients/Patient', [
             'patient' => $patient,
@@ -122,7 +124,8 @@ class PatientController extends Controller
             'actionsTypes' => $actionsTypes,
             'categories' => $categories,
             'medications' => $medications,
-            'scanners' => $scanners
+            'scanners' => $scanners,
+            'lab_results' => $lab_results,
 
         ]);
     }
