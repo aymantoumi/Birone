@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState } from "react";
 import PatientsLayout from "@/Layouts/PatientsLayout";
 import { Head, useForm } from "@inertiajs/react";
 import Pagination from "../Components/Pagination";
 import Update from './Update';
 import CTScans from './Components/CT_scans';
+import Medication from './Components/Medication';
+import LabResults from './Components/LabResults';
 
-export default function Patient({ auth, patient, actions, actionsTypes, categories, scanners }) {
-
+export default function Patient({ auth, patient, actions, actionsTypes, categories, scanners, medications, lab_results }) {
     const { data, setData, put, processing, errors } = useForm({
         first_name: patient.first_name || "",
         last_name: patient.last_name || "",
@@ -23,12 +24,13 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
         payment: '',
     });
 
-    const action_id = actions.data[actions.data.length - 1].id
-
-    console.log(actions.data);
-
-
     const [selectedAction, setSelectedAction] = useState(null);
+    const [selectedActionId, setSelectedActionId] = useState("");
+    const [note, setNote] = useState("");
+    const [checkUp, setCheckUp] = useState("");
+    const [selectedScans, setSelectedScans] = useState([]);
+    const [selectedLabResults, setSelectedLabResults] = useState([]);
+    const [selectedMedications, setSelectedMedications] = useState([]);
 
     const handleChange = (field) => (e) => {
         setData(field, e.target.value);
@@ -66,14 +68,56 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
         setSelectedAction(null);
     };
 
-    const [selectedActionId, setSelectedActionId] = useState("");
-
     const handleSelectChange = (event) => {
-        const selectedValue = event.target.value; 
-        setSelectedActionId(selectedValue); 
-        console.log("Selected Action ID:", selectedValue); 
+        const selectedValue = event.target.value;
+        setSelectedActionId(selectedValue);
     };
-        
+
+    // Handle changes in dynamic select groups
+    const handleChangeDynamic = (namePrefix, index, value) => {
+        if (namePrefix === "scans") {
+            const updatedScans = [...selectedScans];
+            updatedScans[index] = value;
+            setSelectedScans(updatedScans);
+        } else if (namePrefix === "labResults") {
+            const updatedLabResults = [...selectedLabResults];
+            updatedLabResults[index] = value;
+            setSelectedLabResults(updatedLabResults);
+        } else if (namePrefix === "medications") {
+            const updatedMedications = [...selectedMedications];
+            updatedMedications[index] = value;
+            setSelectedMedications(updatedMedications);
+        }
+    };
+
+    // Add new field to dynamic select groups
+    const addNew = (namePrefix) => {
+        if (namePrefix === "scans") {
+            setSelectedScans([...selectedScans, ""]);
+        } else if (namePrefix === "labResults") {
+            setSelectedLabResults([...selectedLabResults, ""]);
+        } else if (namePrefix === "medications") {
+            setSelectedMedications([...selectedMedications, ""]);
+        }
+    };
+
+    // Handle check-up form submission
+    const handleSubmitCheckUp = (e) => {
+        e.preventDefault();
+
+        const formData = {
+            action_id: selectedActionId,
+            scans: selectedScans.filter((scan) => scan !== ""),
+            labResults: selectedLabResults.filter((labResult) => labResult !== ""),
+            medications: selectedMedications.filter((medication) => medication !== ""),
+            note: note,
+            check_up: checkUp,
+        };
+
+        console.log(formData);
+        // Perform your API call or other logic here
+    };
+
     return (
         <PatientsLayout
             user={auth.user}
@@ -85,6 +129,7 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
         >
             <Head title="Patient file" />
             <section className="py-8 px-24 grid gap-3">
+                {/* Patient Details Form */}
                 <div className="dark:bg-gray-800 py-8 px-24 rounded-lg grid 2xl:grid-cols-3 lg:grid-cols-2 grid-cols-1 gap-4">
                     <form
                         className="2xl:col-span-2 bg-sky-600 dark:bg-gray-900 py-5 px-12 rounded-lg"
@@ -144,7 +189,6 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                                 {errors.gender && <span className="text-red-500">{errors.gender}</span>}
                             </div>
                         </div>
-
                         <button
                             type="submit"
                             className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-lg mt-4"
@@ -153,7 +197,8 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                             {processing ? "Updating..." : "Update"}
                         </button>
                     </form>
-                    {/* Actions form  */}
+
+                    {/* Actions Form */}
                     <div className="flex flex-col gap-1 w-full bg-sky-600 dark:bg-gray-900 py-5 px-12 rounded-lg">
                         <form onSubmit={submitActionForm} method="POST" className="grid gap-2">
                             <input type="hidden" name="Patient_ID" value={patient.id} />
@@ -163,7 +208,7 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                                     name="Action"
                                     id="action"
                                     className="font-bold rounded-xl w-1/2"
-                                    value={actionData.Action}  // Ensure this matches the selected action id
+                                    value={actionData.Action}
                                     onChange={handleActionChange('Action')}
                                 >
                                     <option value="" disabled selected>Select visit type</option>
@@ -171,7 +216,6 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                                         <option key={index} value={type.id}>{type.action}</option>
                                     ))}
                                 </select>
-
                                 {actionErrors.Action && <span className="text-red-500">{actionErrors.Action}</span>}
                             </div>
                             <div className="flex justify-between gap-2 items-center">
@@ -187,10 +231,10 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                                 {actionErrors.Payment && <span className="text-red-500">{actionErrors.Payment}</span>}
                             </div>
                             <div className="flex justify-evenly">
-                                <button type="reset" className="bg-yellow-300 ax-w-fit py-2 px-6 rounded-xl font-extrabold hover:bg-yellow-400 hover:scale-110 transition-all ">
+                                <button type="reset" className="bg-yellow-300 max-w-fit py-2 px-6 rounded-xl font-extrabold hover:bg-yellow-400 hover:scale-110 transition-all">
                                     Cancel
                                 </button>
-                                <button type="submit" className="dark:bg-emerald-400 dark:text-green-950 max-w-fit py-2 px-6 rounded-xl font-extrabold hover:bg-green-700 hover:scale-110 bg-emerald-400  transition-all" disabled={processing}>
+                                <button type="submit" className="dark:bg-emerald-400 dark:text-green-950 max-w-fit py-2 px-6 rounded-xl font-extrabold hover:bg-green-700 hover:scale-110 bg-emerald-400 transition-all" disabled={processing}>
                                     Add
                                 </button>
                             </div>
@@ -198,8 +242,7 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                         {/* Display actions */}
                         {actions.data.map((action, index) => {
                             const formattedDate = new Date(action.created_at).toISOString().split('T')[0];
-                            const actionType = action.action_type?.action || "No action type"; // Fallback to handle missing data
-
+                            const actionType = action.action_type?.action || "No action type";
                             return (
                                 <div key={index} className="flex justify-between min-w-fit bg-emerald-200 py-2 px-4 rounded-md" onClick={() => handleActionClick(action)}>
                                     <span>{action.id}</span>
@@ -208,77 +251,96 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                                 </div>
                             );
                         })}
-
                         <Pagination links={actions.links} />
                     </div>
                 </div>
+
+                {/* Check-Up Form */}
                 {auth.user.role === 'admin' && (
-                    <>
-                        <select
-                            className="rounded-xl w-[16rem]"
-                            name="action_id"
-                            id=""
-                            onChange={handleSelectChange} 
-                            value={selectedActionId} 
-                        >
-                            <option value="" disabled selected hidden>
-                                Select an action
-                            </option>
-
-                            {actions.data.map((action, index) => {
-                                const formattedDate = new Date(action.created_at).toISOString().split("T")[0];
-                                const actionType = action.action_type?.action || "No action type";
-
-                                return (
-                                    <option
-                                        value={action.id}
-                                        key={index}
-                                    >
-                                        {formattedDate} | {actionType}
-                                    </option>
-                                );
-                            })}
-                        </select>
-                        <div className="dark:bg-gray-800 bg-sky-100 py-8 px-24 rounded-lg grid  lg:grid-cols-2 grid-cols-1 gap-4">
+                    <form onSubmit={handleSubmitCheckUp} method="post">
+                        <div className="dark:bg-gray-800 bg-sky-100 py-8 px-24 rounded-lg flex flex-col gap-4">
                             <div className="dark:bg-gray-900 bg-zinc-300 rounded-lg py-4 px-10">
-                                <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
-                                    <h1 className="font-extrabold dark:text-stone-500 text-lg">
-                                        Past Medical Conditions :
-                                    </h1>
-                                    <span className="font-bold dark:text-gray-200"> Patient</span>
+                                <select
+                                    className="rounded-xl w-[16rem]"
+                                    name="action_id"
+                                    onChange={handleSelectChange}
+                                    value={selectedActionId}
+                                >
+                                    <option value="" disabled selected hidden>
+                                        Select an action
+                                    </option>
+                                    {actions.data.map((action, index) => {
+                                        const formattedDate = new Date(action.created_at).toISOString().split("T")[0];
+                                        const actionType = action.action_type?.action || "No action type";
+                                        return (
+                                            <option value={action.id} key={index}>
+                                                {formattedDate} | {actionType}
+                                            </option>
+                                        );
+                                    })}
+                                </select>
+                            </div>
+                            <div className='grid gap-6'>
+                                <div className="dark:bg-gray-900 bg-zinc-300 py-8 px-24 rounded-lg flex flex-wrap gap-4 justify-between">
+                                    <DynamicSelectGroup
+                                        title="CT Scans"
+                                        options={scanners.map(scanner => ({ id: scanner.id, label: scanner.scan }))}
+                                        values={selectedScans}
+                                        onChange={(index, value) => handleChangeDynamic("scans", index, value)}
+                                        onAdd={() => addNew("scans")}
+                                        namePrefix="scans"
+                                    />
+                                    <DynamicSelectGroup
+                                        title="Lab Results"
+                                        options={lab_results.map(labResult => ({ id: labResult.id, label: labResult.lab_results }))}
+                                        values={selectedLabResults}
+                                        onChange={(index, value) => handleChangeDynamic("labResults", index, value)}
+                                        onAdd={() => addNew("labResults")}
+                                        namePrefix="labResults"
+                                    />
+                                    <DynamicSelectGroup
+                                        title="Medication"
+                                        options={medications.map(medication => ({ id: medication.id, label: medication.medication }))}
+                                        values={selectedMedications}
+                                        onChange={(index, value) => handleChangeDynamic("medications", index, value)}
+                                        onAdd={() => addNew("medications")}
+                                        namePrefix="medications"
+                                    />
                                 </div>
-                                <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
-                                    <h1 className="font-extrabold dark:text-stone-500 text-lg">
-                                        Past Surgeries :
-                                    </h1>
-                                    <span className="font-bold dark:text-gray-200"> Patient</span>
-                                </div>
-                                <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
-                                    <h1 className="font-extrabold dark:text-stone-500 text-lg">
-                                        Family Medical History  :
-                                    </h1>
-                                    <span className="font-bold dark:text-gray-200"> Patient</span>
-                                </div>
-                                <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
-                                    <h1 className="font-extrabold dark:text-stone-500 text-lg">
-                                        Smoking Status :
-                                    </h1>
-                                    <span className="font-bold dark:text-gray-200"> Patient</span>
-                                </div>
-                                <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
-                                    <h1 className="font-extrabold dark:text-stone-500 text-lg">
-                                        Alcohol Consumption :
-                                    </h1>
-                                    <span className="font-bold dark:text-gray-200"> Patient</span>
+                                <div className="dark:bg-gray-900 bg-zinc-300 py-8 px-24 rounded-lg flex flex-wrap gap-4 justify-between">
+                                    <div className="flex flex-col gap-2 flex-basis-[calc(100%-0.5rem)] min-w-[40rem]">
+                                        <label htmlFor="note" className="dark:text-gray-100 text-2xl font-bold">Note</label>
+                                        <textarea
+                                            name="note"
+                                            id="note"
+                                            rows="15"
+                                            className="rounded-xl"
+                                            value={note}
+                                            onChange={(e) => setNote(e.target.value)}
+                                        ></textarea>
+                                    </div>
+                                    <div className="flex flex-col gap-2 flex-basis-[calc(100%-0.5rem)] min-w-[40rem]">
+                                        <label htmlFor="check_up" className="dark:text-gray-100 text-2xl font-bold">Check up</label>
+                                        <textarea
+                                            name="check_up"
+                                            id="check_up"
+                                            rows="15"
+                                            className="rounded-xl"
+                                            value={checkUp}
+                                            onChange={(e) => setCheckUp(e.target.value)}
+                                        ></textarea>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="dark:bg-gray-900 bg-zinc-300 py-8 px-24 rounded-lg ">
-                                <CTScans scans={scanners} action_id={selectedActionId} />
-                            </div>
+                            <button
+                                type="submit"
+                                className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-lg mt-4 max-w-fit"
+                            >
+                                Save
+                            </button>
                         </div>
-                    </>
-                )
-                }
+                    </form>
+                )}
             </section>
 
             {/* Update Modal */}
@@ -288,3 +350,40 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
         </PatientsLayout>
     );
 }
+
+// Dynamic Select Group Component
+const DynamicSelectGroup = ({ title, options, values, onChange, onAdd, namePrefix }) => {
+    return (
+        <div className="flex flex-col gap-4">
+            <h1 className="dark:text-gray-200 text-xl font-extrabold">{title}</h1>
+            <div className="flex flex-col flex-wrap gap-3">
+                {values.map((value, index) => (
+                    <div key={index} className="flex flex-col gap-1">
+                        <select
+                            className="rounded-xl w-[16rem]"
+                            name={`${namePrefix}-${index}`}
+                            id={`${namePrefix}-${index}`}
+                            value={value || ""}
+                            onChange={(e) => onChange(index, e.target.value)}
+                        >
+                            <option value="">Select an option</option>
+                            {options.map((opt) => (
+                                <option key={opt.id} value={opt.id}>
+                                    {opt.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                ))}
+
+                <button
+                    type="button"
+                    onClick={onAdd}
+                    className="text-green-600 text-2xl"
+                >
+                    <i className="fa-solid fa-circle-plus"></i>
+                </button>
+            </div>
+        </div>
+    );
+};

@@ -94,24 +94,30 @@ export default function Index({ auth, patients, queryParams = {} }) {
                             <tbody className="">
                                 {patients.data.map((patient, index) => (
                                     <tr
-                                        key={patient.id}
-                                        className={`text-center ${index % 2 === 0 ? 'dark:bg-stone-200 bg-sky-100' : 'dark:bg-slate-300 bg-sky-300'
-                                            } hover:bg-sky-200 transition duration-300`}
-                                    >
-                                        <td className="px-4 py-2 border-b border-gray-200 font-semibold">
-                                            <Link href={route("Patients.show", patient.id)} className="text-blue-600 hover:underline">
-                                                {patient.id}
-                                            </Link>
-
-                                        </td>
-                                        <td className="px-4 py-2 border-b border-gray-200">{patient.cin}</td>
-                                        <td className="px-4 py-2 border-b border-gray-200">
-                                            {patient.first_name} {patient.last_name}
-                                        </td>
-                                        <td className="px-4 py-2 border-b border-gray-200">{patient.gender}</td>
-                                        <td className="px-4 py-2 border-b border-gray-200">{patient.phone}</td>
-                                        <td className="px-4 py-2 border-b border-gray-200">{patient.birth_date}</td>
-                                    </tr>
+                                    key={patient.id}
+                                    className={`text-center cursor-pointer ${index % 2 === 0 ? 'dark:bg-stone-200 bg-sky-100' : 'dark:bg-slate-300 bg-sky-300'
+                                        } hover:bg-sky-200 transition duration-300`}
+                                >
+                                    <td colSpan="6">
+                                        <Link
+                                            href={route("Patients.show", patient.id)}
+                                            className="block text-black hover:text-black" 
+                                        >
+                                            <div className="grid grid-cols-6">
+                                                <div className="px-4 py-2 border-b border-gray-200 font-semibold">
+                                                    {patient.id}
+                                                </div>
+                                                <div className="px-4 py-2 border-b border-gray-200">{patient.cin}</div>
+                                                <div className="px-4 py-2 border-b border-gray-200">
+                                                    {patient.first_name} {patient.last_name}
+                                                </div>
+                                                <div className="px-4 py-2 border-b border-gray-200">{patient.gender}</div>
+                                                <div className="px-4 py-2 border-b border-gray-200">{patient.phone}</div>
+                                                <div className="px-4 py-2 border-b border-gray-200">{patient.birth_date}</div>
+                                            </div>
+                                        </Link>
+                                    </td>
+                                </tr>
                                 ))}
                             </tbody>
                         </table>
