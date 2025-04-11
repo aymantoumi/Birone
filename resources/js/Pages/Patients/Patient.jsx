@@ -3,9 +3,6 @@ import PatientsLayout from "@/Layouts/PatientsLayout";
 import { Head, useForm } from "@inertiajs/react";
 import Pagination from "../Components/Pagination";
 import Update from './Update';
-import CTScans from './Components/CT_scans';
-import Medication from './Components/Medication';
-import LabResults from './Components/LabResults';
 
 export default function Patient({ auth, patient, actions, actionsTypes, categories, scanners, medications, lab_results }) {
     const { data, setData, put, processing, errors } = useForm({
@@ -24,13 +21,17 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
         payment: '',
     });
 
+    // Use useForm for the Check-Up form
+    const { data: checkUpData, setData: setCheckUpData, post: postCheckUp, processing: checkUpProcessing, errors: checkUpErrors } = useForm({
+        action_id: '',
+        scans: [],
+        labResults: [],
+        medications: [],
+        note: '',
+        check_up: '',
+    });
+
     const [selectedAction, setSelectedAction] = useState(null);
-    const [selectedActionId, setSelectedActionId] = useState("");
-    const [note, setNote] = useState("");
-    const [checkUp, setCheckUp] = useState("");
-    const [selectedScans, setSelectedScans] = useState([]);
-    const [selectedLabResults, setSelectedLabResults] = useState([]);
-    const [selectedMedications, setSelectedMedications] = useState([]);
 
     const handleChange = (field) => (e) => {
         setData(field, e.target.value);
@@ -68,54 +69,47 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
         setSelectedAction(null);
     };
 
-    const handleSelectChange = (event) => {
-        const selectedValue = event.target.value;
-        setSelectedActionId(selectedValue);
-    };
-
     // Handle changes in dynamic select groups
     const handleChangeDynamic = (namePrefix, index, value) => {
         if (namePrefix === "scans") {
-            const updatedScans = [...selectedScans];
+            const updatedScans = [...checkUpData.scans];
             updatedScans[index] = value;
-            setSelectedScans(updatedScans);
+            setCheckUpData('scans', updatedScans);
         } else if (namePrefix === "labResults") {
-            const updatedLabResults = [...selectedLabResults];
+            const updatedLabResults = [...checkUpData.labResults];
             updatedLabResults[index] = value;
-            setSelectedLabResults(updatedLabResults);
+            setCheckUpData('labResults', updatedLabResults);
         } else if (namePrefix === "medications") {
-            const updatedMedications = [...selectedMedications];
+            const updatedMedications = [...checkUpData.medications];
             updatedMedications[index] = value;
-            setSelectedMedications(updatedMedications);
+            setCheckUpData('medications', updatedMedications);
         }
     };
 
     // Add new field to dynamic select groups
     const addNew = (namePrefix) => {
         if (namePrefix === "scans") {
-            setSelectedScans([...selectedScans, ""]);
+            setCheckUpData('scans', [...checkUpData.scans, ""]);
         } else if (namePrefix === "labResults") {
-            setSelectedLabResults([...selectedLabResults, ""]);
+            setCheckUpData('labResults', [...checkUpData.labResults, ""]);
         } else if (namePrefix === "medications") {
-            setSelectedMedications([...selectedMedications, ""]);
+            setCheckUpData('medications', [...checkUpData.medications, ""]);
         }
     };
 
-    // Handle check-up form submission
+    // Handle Check-Up Form Submission
     const handleSubmitCheckUp = (e) => {
         e.preventDefault();
 
-        const formData = {
-            action_id: selectedActionId,
-            scans: selectedScans.filter((scan) => scan !== ""),
-            labResults: selectedLabResults.filter((labResult) => labResult !== ""),
-            medications: selectedMedications.filter((medication) => medication !== ""),
-            note: note,
-            check_up: checkUp,
-        };
-
-        console.log(formData);
-        // Perform your API call or other logic here
+        // Submit the form data using Inertia's post method
+        postCheckUp(route('patients.checkup', { patient: patient.id }), {
+            onSuccess: () => {
+                console.log("Check-up data saved successfully!");
+            },
+            onError: (errors) => {
+                console.error("Validation errors:", errors);
+            },
+        });
     };
 
     return (
@@ -200,7 +194,7 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
 
                     {/* Actions Form */}
                     <div className="flex flex-col gap-1 w-full bg-sky-600 dark:bg-gray-900 py-5 px-12 rounded-lg">
-                        <form onSubmit={submitActionForm} method="POST" className="grid gap-2">
+                    <form onSubmit={submitActionForm} method="POST" className="grid gap-2">
                             <input type="hidden" name="Patient_ID" value={patient.id} />
                             <div className="flex justify-between gap-2 items-center">
                                 <label htmlFor="action" className="dark:text-stone-200 font-extrabold">Action </label>
@@ -239,8 +233,8 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                                 </button>
                             </div>
                         </form>
-                        {/* Display actions */}
-                        {actions.data.map((action, index) => {
+                         {/* Display actions */}
+                         {actions.data.map((action, index) => {
                             const formattedDate = new Date(action.created_at).toISOString().split('T')[0];
                             const actionType = action.action_type?.action || "No action type";
                             return (
@@ -263,8 +257,8 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                                 <select
                                     className="rounded-xl w-[16rem]"
                                     name="action_id"
-                                    onChange={handleSelectChange}
-                                    value={selectedActionId}
+                                    value={checkUpData.action_id}
+                                    onChange={(e) => setCheckUpData('action_id', e.target.value)}
                                 >
                                     <option value="" disabled selected hidden>
                                         Select an action
@@ -279,31 +273,44 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                                         );
                                     })}
                                 </select>
+                                {checkUpErrors.action_id && <span className="text-red-500">{checkUpErrors.action_id}</span>}
                             </div>
                             <div className='grid gap-6'>
                                 <div className="dark:bg-gray-900 bg-zinc-300 py-8 px-24 rounded-lg flex flex-wrap gap-4 justify-between">
                                     <DynamicSelectGroup
                                         title="CT Scans"
                                         options={scanners.map(scanner => ({ id: scanner.id, label: scanner.scan }))}
-                                        values={selectedScans}
-                                        onChange={(index, value) => handleChangeDynamic("scans", index, value)}
-                                        onAdd={() => addNew("scans")}
+                                        values={checkUpData.scans}
+                                        onChange={(index, value) => {
+                                            const updatedScans = [...checkUpData.scans];
+                                            updatedScans[index] = value;
+                                            setCheckUpData('scans', updatedScans);
+                                        }}
+                                        onAdd={() => setCheckUpData('scans', [...checkUpData.scans, ""])}
                                         namePrefix="scans"
                                     />
                                     <DynamicSelectGroup
                                         title="Lab Results"
                                         options={lab_results.map(labResult => ({ id: labResult.id, label: labResult.lab_results }))}
-                                        values={selectedLabResults}
-                                        onChange={(index, value) => handleChangeDynamic("labResults", index, value)}
-                                        onAdd={() => addNew("labResults")}
+                                        values={checkUpData.labResults}
+                                        onChange={(index, value) => {
+                                            const updatedLabResults = [...checkUpData.labResults];
+                                            updatedLabResults[index] = value;
+                                            setCheckUpData('labResults', updatedLabResults);
+                                        }}
+                                        onAdd={() => setCheckUpData('labResults', [...checkUpData.labResults, ""])}
                                         namePrefix="labResults"
                                     />
                                     <DynamicSelectGroup
                                         title="Medication"
                                         options={medications.map(medication => ({ id: medication.id, label: medication.medication }))}
-                                        values={selectedMedications}
-                                        onChange={(index, value) => handleChangeDynamic("medications", index, value)}
-                                        onAdd={() => addNew("medications")}
+                                        values={checkUpData.medications}
+                                        onChange={(index, value) => {
+                                            const updatedMedications = [...checkUpData.medications];
+                                            updatedMedications[index] = value;
+                                            setCheckUpData('medications', updatedMedications);
+                                        }}
+                                        onAdd={() => setCheckUpData('medications', [...checkUpData.medications, ""])}
                                         namePrefix="medications"
                                     />
                                 </div>
@@ -315,9 +322,10 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                                             id="note"
                                             rows="15"
                                             className="rounded-xl"
-                                            value={note}
-                                            onChange={(e) => setNote(e.target.value)}
+                                            value={checkUpData.note}
+                                            onChange={(e) => setCheckUpData('note', e.target.value)}
                                         ></textarea>
+                                        {checkUpErrors.note && <span className="text-red-500">{checkUpErrors.note}</span>}
                                     </div>
                                     <div className="flex flex-col gap-2 flex-basis-[calc(100%-0.5rem)] min-w-[40rem]">
                                         <label htmlFor="check_up" className="dark:text-gray-100 text-2xl font-bold">Check up</label>
@@ -326,17 +334,19 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                                             id="check_up"
                                             rows="15"
                                             className="rounded-xl"
-                                            value={checkUp}
-                                            onChange={(e) => setCheckUp(e.target.value)}
+                                            value={checkUpData.check_up}
+                                            onChange={(e) => setCheckUpData('check_up', e.target.value)}
                                         ></textarea>
+                                        {checkUpErrors.check_up && <span className="text-red-500">{checkUpErrors.check_up}</span>}
                                     </div>
                                 </div>
                             </div>
                             <button
                                 type="submit"
                                 className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-lg mt-4 max-w-fit"
+                                disabled={checkUpProcessing}
                             >
-                                Save
+                                {checkUpProcessing ? "Saving..." : "Save"}
                             </button>
                         </div>
                     </form>
@@ -375,7 +385,6 @@ const DynamicSelectGroup = ({ title, options, values, onChange, onAdd, namePrefi
                         </select>
                     </div>
                 ))}
-
                 <button
                     type="button"
                     onClick={onAdd}

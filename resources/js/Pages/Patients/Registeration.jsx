@@ -3,7 +3,6 @@ import { Head, useForm } from "@inertiajs/react";
 import Pagination from "../Components/Pagination";
 
 export default function Registration({ auth, total_count, waiting, done, actionsWaiting, categories }) {
-    console.log(categories);
 
     const { data, setData, post, processing, errors } = useForm({
         first_name: '',
