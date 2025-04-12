@@ -112,6 +112,12 @@ class PatientController extends Controller
             ->with(['actionType'])  // Ensure the actionType is loaded
             ->paginate(5);
 
+        $pending_actions = Action::where('patient_id', $patientId)
+            ->where('Status', false)
+            ->orderBy('created_at', 'desc')
+            ->with(['actionType'])
+            ->get();  // Ensure the actionType is loaded
+            
         $actionsTypes = ActionsType::all();
         $medications = Medication::all();
         $categories = Category::all();
@@ -126,7 +132,7 @@ class PatientController extends Controller
             'medications' => $medications,
             'scanners' => $scanners,
             'lab_results' => $lab_results,
-
+            'pending_actions' => $pending_actions,
         ]);
     }
 

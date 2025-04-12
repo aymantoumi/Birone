@@ -4,7 +4,8 @@ import { Head, useForm } from "@inertiajs/react";
 import Pagination from "../Components/Pagination";
 import Update from './Update';
 
-export default function Patient({ auth, patient, actions, actionsTypes, categories, scanners, medications, lab_results }) {
+export default function Patient({ auth, patient, actions, pending_actions, actionsTypes, categories, scanners, medications, lab_results }) {
+
     const { data, setData, put, processing, errors } = useForm({
         first_name: patient.first_name || "",
         last_name: patient.last_name || "",
@@ -17,8 +18,8 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
     });
 
     const { data: actionData, setData: setActionData, post: postAction, processing: actionProcessing, errors: actionErrors } = useForm({
-        action: '',
-        payment: '',
+        action: '', // Lowercase
+        payment: '', // Lowercase
     });
 
     // Use useForm for the Check-Up form
@@ -38,10 +39,10 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
     };
 
     const handleActionChange = (field) => (event) => {
-        setActionData({
-            ...actionData,
+        setActionData((prevData) => ({
+            ...prevData,
             [field]: event.target.value,
-        });
+        }));
     };
 
     const submitForm = (e) => {
@@ -54,8 +55,8 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
         postAction(route('patients.actions.store', { patient: patient.id }), {
             onSuccess: () => {
                 setActionData({
-                    Action: '',
-                    Payment: '',
+                    action: '', // Lowercase
+                    payment: '', // Lowercase
                 });
             },
         });
@@ -194,16 +195,16 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
 
                     {/* Actions Form */}
                     <div className="flex flex-col gap-1 w-full bg-sky-600 dark:bg-gray-900 py-5 px-12 rounded-lg">
-                    <form onSubmit={submitActionForm} method="POST" className="grid gap-2">
+                        <form onSubmit={submitActionForm} method="POST" className="grid gap-2">
                             <input type="hidden" name="Patient_ID" value={patient.id} />
                             <div className="flex justify-between gap-2 items-center">
                                 <label htmlFor="action" className="dark:text-stone-200 font-extrabold">Action </label>
                                 <select
-                                    name="Action"
+                                    name="action"
                                     id="action"
                                     className="font-bold rounded-xl w-1/2"
-                                    value={actionData.Action}
-                                    onChange={handleActionChange('Action')}
+                                    value={actionData.action} // Lowercase
+                                    onChange={handleActionChange('action')} // Lowercase
                                 >
                                     <option value="" disabled selected>Select visit type</option>
                                     {actionsTypes.map((type, index) => (
@@ -216,11 +217,11 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                                 <label htmlFor="price" className="dark:text-stone-200 font-extrabold">Price</label>
                                 <input
                                     type="number"
-                                    name="Payment"
+                                    name="payment"
                                     id="price"
                                     className="font-bold rounded-xl w-1/2"
-                                    value={actionData.Payment}
-                                    onChange={handleActionChange('Payment')}
+                                    value={actionData.payment} // Lowercase
+                                    onChange={handleActionChange('payment')} // Lowercase
                                 />
                                 {actionErrors.Payment && <span className="text-red-500">{actionErrors.Payment}</span>}
                             </div>
@@ -233,8 +234,8 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                                 </button>
                             </div>
                         </form>
-                         {/* Display actions */}
-                         {actions.data.map((action, index) => {
+                        {/* Display actions */}
+                        {actions.data.map((action, index) => {
                             const formattedDate = new Date(action.created_at).toISOString().split('T')[0];
                             const actionType = action.action_type?.action || "No action type";
                             return (
@@ -263,7 +264,7 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                                     <option value="" disabled selected hidden>
                                         Select an action
                                     </option>
-                                    {actions.data.map((action, index) => {
+                                    {pending_actions.map((action, index) => {
                                         const formattedDate = new Date(action.created_at).toISOString().split("T")[0];
                                         const actionType = action.action_type?.action || "No action type";
                                         return (

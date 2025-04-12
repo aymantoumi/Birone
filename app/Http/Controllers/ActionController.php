@@ -32,33 +32,33 @@ class ActionController extends Controller
     {
         // Validate incoming data
         $validatedData = $request->validate([
-            'Action' => 'required|integer|exists:actions_types,id', 
+            'action' => 'required|integer|exists:actions_types,id',
+            'payment' => 'nullable|integer',
         ]);
-    
+
         // Prepare the data for the actions table
         $data = [
             'patient_id' => $patientId,
-            'actions_types_id' => $validatedData['Action'], // Use Action ID from the form
-            'payment' => $validatedData['Payment'] ?? 0, // Default to 0 if no payment is provided
+            'actions_types_id' => $validatedData['action'], // Lowercase
+            'payment' => $validatedData['payment'] ?? 0, // Default to 0 if no payment is provided
             'created_by' => auth()->id(),
             'updated_by' => auth()->id(),
         ];
-    
+
         // Insert the new action record
         $action = Action::create($data);
-    
+
         // Find the patient and update the status if necessary
         $patient = Patient::findOrFail($patientId);
-    
+
         if ($patient->status) {
             $patient->status = false;
             $patient->save();
         }
-    
+
         // Redirect to the Patients creation route
         return to_route('Patients.create')->with('success', 'Action successfully created.');
     }
-    
 
     /**
      * Display the specified resource.
@@ -74,7 +74,7 @@ class ActionController extends Controller
     public function edit($actionId)
     {
         $action = Action::findOrFail($actionId);
-        $actionsTypes = ActionsType::all(); 
+        $actionsTypes = ActionsType::all();
         return response()->json([$action, $actionsTypes]);
     }
 
@@ -89,22 +89,22 @@ class ActionController extends Controller
         $validated = $request->validate([
             'status' => 'required|boolean',
         ]);
-    
+
         // Find the Action model by ID
         $action = Action::findOrFail($actionId);
-        
+
         // Update the status field on the Action model
         $action->Status = $validated['status'];
-        
+
         // Optionally, store who updated the action
         $action->updated_by = auth()->id();
-        
+
         // Save the changes
         $action->save();
-    
+
         // Return a success message
         return back()->with('success', 'Action status updated successfully!');
-    }    
+    }
     /**
      * Update the specified resource in storage.
      */
@@ -114,28 +114,28 @@ class ActionController extends Controller
         $request->merge([
             'actions_types_id' => (int) $request->input('action')
         ]);
-    
+
         // Validate the incoming request data
         $validatedData = $request->validate([
             'actions_types_id' => 'required|integer|exists:actions_types,id', // Ensure the action type ID is valid
             'payment' => 'nullable|integer',
         ]);
-    
+
         // Find the action by its ID or fail if not found
         $action = Action::findOrFail($actionId);
-    
+
         // Update the action with the validated data
         $action->actions_types_id = $validatedData['actions_types_id'];
         $action->payment = $validatedData['payment'];
-        $action->updated_by = auth()->id();  
-    
+        $action->updated_by = auth()->id();
+
         // Save the changes to the database
         $action->save();
-    
+
         // Redirect back with a success message
         return back()->with('success', 'Action updated successfully!');
     }
-    
+
 
     /**
      * Remove the specified resource from storage.
@@ -144,5 +144,5 @@ class ActionController extends Controller
     {
         $action->delete();
         return redirect()->back()->with('success', 'Action deleted successfully!');
-    }    
+    }
 }
