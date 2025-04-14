@@ -104,6 +104,8 @@ class PatientController extends Controller
      */
     public function show($patientId)
     {
+        $today = date('Y-m-d');
+
         $patient = Patient::findOrFail($patientId);
 
         // Load actions with actionType relationship
@@ -113,6 +115,7 @@ class PatientController extends Controller
             ->paginate(5);
 
         $pending_actions = Action::where('patient_id', $patientId)
+            ->whereDate('created_at', $today)
             ->where('Status', false)
             ->orderBy('created_at', 'desc')
             ->with(['actionType'])

@@ -4,13 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Note extends Model
+class check_up extends Model
 {
+    protected $table = 'check_ups';
 
-    protected $table = 'notes';
-    
     protected $fillable = [
-        'note',
+        'check_up',
         'action_id',
     ];
 
@@ -18,4 +17,6 @@ class Note extends Model
     {
         return $this->belongsTo(Action::class, 'action_id');
     }
+
 }
+ 

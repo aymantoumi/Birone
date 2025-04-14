@@ -3,6 +3,7 @@ import PatientsLayout from "@/Layouts/PatientsLayout";
 import { Head, useForm } from "@inertiajs/react";
 import Pagination from "../Components/Pagination";
 import Update from './Update';
+import ChackUpsRecord from "./Components/CheckUpsRecord";
 
 export default function Patient({ auth, patient, actions, pending_actions, actionsTypes, categories, scanners, medications, lab_results }) {
 
@@ -18,8 +19,8 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
     });
 
     const { data: actionData, setData: setActionData, post: postAction, processing: actionProcessing, errors: actionErrors } = useForm({
-        action: '', // Lowercase
-        payment: '', // Lowercase
+        action: '',
+        payment: '',
     });
 
     // Use useForm for the Check-Up form
@@ -55,8 +56,8 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
         postAction(route('patients.actions.store', { patient: patient.id }), {
             onSuccess: () => {
                 setActionData({
-                    action: '', // Lowercase
-                    payment: '', // Lowercase
+                    action: '',
+                    payment: '',
                 });
             },
         });
@@ -68,6 +69,18 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
 
     const closeModal = () => {
         setSelectedAction(null);
+    };
+
+    const [recordStatus, setRecordStatus] = useState(false); 
+
+    // Function to open the modal
+    const openRecord = () => {
+        setRecordStatus(true); 
+    };
+
+    // Function to close the modal
+    const closeRecord = () => {
+        setRecordStatus(false); 
     };
 
     // Handle changes in dynamic select groups
@@ -203,8 +216,8 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
                                     name="action"
                                     id="action"
                                     className="font-bold rounded-xl w-1/2"
-                                    value={actionData.action} // Lowercase
-                                    onChange={handleActionChange('action')} // Lowercase
+                                    value={actionData.action}
+                                    onChange={handleActionChange('action')}
                                 >
                                     <option value="" disabled selected>Select visit type</option>
                                     {actionsTypes.map((type, index) => (
@@ -220,8 +233,8 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
                                     name="payment"
                                     id="price"
                                     className="font-bold rounded-xl w-1/2"
-                                    value={actionData.payment} // Lowercase
-                                    onChange={handleActionChange('payment')} // Lowercase
+                                    value={actionData.payment}
+                                    onChange={handleActionChange('payment')}
                                 />
                                 {actionErrors.Payment && <span className="text-red-500">{actionErrors.Payment}</span>}
                             </div>
@@ -252,105 +265,116 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
 
                 {/* Check-Up Form */}
                 {auth.user.role === 'admin' && (
-                    <form onSubmit={handleSubmitCheckUp} method="post">
-                        <div className="dark:bg-gray-800 bg-sky-100 py-8 px-24 rounded-lg flex flex-col gap-4">
-                            <div className="dark:bg-gray-900 bg-zinc-300 rounded-lg py-4 px-10">
-                                <select
-                                    className="rounded-xl w-[16rem]"
-                                    name="action_id"
-                                    value={checkUpData.action_id}
-                                    onChange={(e) => setCheckUpData('action_id', e.target.value)}
-                                >
-                                    <option value="" disabled selected hidden>
-                                        Select an action
-                                    </option>
-                                    {pending_actions.map((action, index) => {
-                                        const formattedDate = new Date(action.created_at).toISOString().split("T")[0];
-                                        const actionType = action.action_type?.action || "No action type";
-                                        return (
-                                            <option value={action.id} key={index}>
-                                                {formattedDate} | {actionType}
-                                            </option>
-                                        );
-                                    })}
-                                </select>
-                                {checkUpErrors.action_id && <span className="text-red-500">{checkUpErrors.action_id}</span>}
-                            </div>
-                            <div className='grid gap-6'>
-                                <div className="dark:bg-gray-900 bg-zinc-300 py-8 px-24 rounded-lg flex flex-wrap gap-4 justify-between">
-                                    <DynamicSelectGroup
-                                        title="CT Scans"
-                                        options={scanners.map(scanner => ({ id: scanner.id, label: scanner.scan }))}
-                                        values={checkUpData.scans}
-                                        onChange={(index, value) => {
-                                            const updatedScans = [...checkUpData.scans];
-                                            updatedScans[index] = value;
-                                            setCheckUpData('scans', updatedScans);
-                                        }}
-                                        onAdd={() => setCheckUpData('scans', [...checkUpData.scans, ""])}
-                                        namePrefix="scans"
-                                    />
-                                    <DynamicSelectGroup
-                                        title="Lab Results"
-                                        options={lab_results.map(labResult => ({ id: labResult.id, label: labResult.lab_results }))}
-                                        values={checkUpData.labResults}
-                                        onChange={(index, value) => {
-                                            const updatedLabResults = [...checkUpData.labResults];
-                                            updatedLabResults[index] = value;
-                                            setCheckUpData('labResults', updatedLabResults);
-                                        }}
-                                        onAdd={() => setCheckUpData('labResults', [...checkUpData.labResults, ""])}
-                                        namePrefix="labResults"
-                                    />
-                                    <DynamicSelectGroup
-                                        title="Medication"
-                                        options={medications.map(medication => ({ id: medication.id, label: medication.medication }))}
-                                        values={checkUpData.medications}
-                                        onChange={(index, value) => {
-                                            const updatedMedications = [...checkUpData.medications];
-                                            updatedMedications[index] = value;
-                                            setCheckUpData('medications', updatedMedications);
-                                        }}
-                                        onAdd={() => setCheckUpData('medications', [...checkUpData.medications, ""])}
-                                        namePrefix="medications"
-                                    />
-                                </div>
-                                <div className="dark:bg-gray-900 bg-zinc-300 py-8 px-24 rounded-lg flex flex-wrap gap-4 justify-between">
-                                    <div className="flex flex-col gap-2 flex-basis-[calc(100%-0.5rem)] min-w-[40rem]">
-                                        <label htmlFor="note" className="dark:text-gray-100 text-2xl font-bold">Note</label>
-                                        <textarea
-                                            name="note"
-                                            id="note"
-                                            rows="15"
-                                            className="rounded-xl"
-                                            value={checkUpData.note}
-                                            onChange={(e) => setCheckUpData('note', e.target.value)}
-                                        ></textarea>
-                                        {checkUpErrors.note && <span className="text-red-500">{checkUpErrors.note}</span>}
-                                    </div>
-                                    <div className="flex flex-col gap-2 flex-basis-[calc(100%-0.5rem)] min-w-[40rem]">
-                                        <label htmlFor="check_up" className="dark:text-gray-100 text-2xl font-bold">Check up</label>
-                                        <textarea
-                                            name="check_up"
-                                            id="check_up"
-                                            rows="15"
-                                            className="rounded-xl"
-                                            value={checkUpData.check_up}
-                                            onChange={(e) => setCheckUpData('check_up', e.target.value)}
-                                        ></textarea>
-                                        {checkUpErrors.check_up && <span className="text-red-500">{checkUpErrors.check_up}</span>}
-                                    </div>
-                                </div>
-                            </div>
-                            <button
-                                type="submit"
-                                className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-lg mt-4 max-w-fit"
-                                disabled={checkUpProcessing}
-                            >
-                                {checkUpProcessing ? "Saving..." : "Save"}
+                    <>
+                        <button 
+                        onClick={openRecord}
+                        className="w-fit dark:bg-cyan-200 bg-cyan-900 py-2 px-5 rounded-xl font-extrabold"
+                        >
+                            Open Record
                             </button>
-                        </div>
-                    </form>
+                        <ChackUpsRecord
+                            onClose={closeRecord} 
+                            show={recordStatus} 
+                        />                        <form onSubmit={handleSubmitCheckUp} method="post">
+                            <div className="dark:bg-gray-800 bg-sky-100 py-8 px-24 rounded-lg flex flex-col gap-4">
+                                <div className="dark:bg-gray-900 bg-zinc-300 rounded-lg py-4 px-10">
+                                    <select
+                                        className="rounded-xl w-[16rem]"
+                                        name="action_id"
+                                        value={checkUpData.action_id}
+                                        onChange={(e) => setCheckUpData('action_id', e.target.value)}
+                                    >
+                                        <option value="" disabled selected hidden>
+                                            Select an action
+                                        </option>
+                                        {pending_actions.map((action, index) => {
+                                            const formattedDate = new Date(action.created_at).toISOString().split("T")[0];
+                                            const actionType = action.action_type?.action || "No action type";
+                                            return (
+                                                <option value={action.id} key={index}>
+                                                    {formattedDate} | {actionType}
+                                                </option>
+                                            );
+                                        })}
+                                    </select>
+                                    {checkUpErrors.action_id && <span className="text-red-500">{checkUpErrors.action_id}</span>}
+                                </div>
+                                <div className='grid gap-6'>
+                                    <div className="dark:bg-gray-900 bg-zinc-300 py-8 px-24 rounded-lg flex flex-wrap gap-4 justify-between">
+                                        <DynamicSelectGroup
+                                            title="CT Scans"
+                                            options={scanners.map(scanner => ({ id: scanner.id, label: scanner.scan }))}
+                                            values={checkUpData.scans}
+                                            onChange={(index, value) => {
+                                                const updatedScans = [...checkUpData.scans];
+                                                updatedScans[index] = value;
+                                                setCheckUpData('scans', updatedScans);
+                                            }}
+                                            onAdd={() => setCheckUpData('scans', [...checkUpData.scans, ""])}
+                                            namePrefix="scans"
+                                        />
+                                        <DynamicSelectGroup
+                                            title="Lab Results"
+                                            options={lab_results.map(labResult => ({ id: labResult.id, label: labResult.lab_results }))}
+                                            values={checkUpData.labResults}
+                                            onChange={(index, value) => {
+                                                const updatedLabResults = [...checkUpData.labResults];
+                                                updatedLabResults[index] = value;
+                                                setCheckUpData('labResults', updatedLabResults);
+                                            }}
+                                            onAdd={() => setCheckUpData('labResults', [...checkUpData.labResults, ""])}
+                                            namePrefix="labResults"
+                                        />
+                                        <DynamicSelectGroup
+                                            title="Medication"
+                                            options={medications.map(medication => ({ id: medication.id, label: medication.medication }))}
+                                            values={checkUpData.medications}
+                                            onChange={(index, value) => {
+                                                const updatedMedications = [...checkUpData.medications];
+                                                updatedMedications[index] = value;
+                                                setCheckUpData('medications', updatedMedications);
+                                            }}
+                                            onAdd={() => setCheckUpData('medications', [...checkUpData.medications, ""])}
+                                            namePrefix="medications"
+                                        />
+                                    </div>
+                                    <div className="dark:bg-gray-900 bg-zinc-300 py-8 px-24 rounded-lg flex flex-wrap gap-4 justify-between">
+                                        <div className="flex flex-col gap-2 flex-basis-[calc(100%-0.5rem)] min-w-[40rem]">
+                                            <label htmlFor="note" className="dark:text-gray-100 text-2xl font-bold">Note</label>
+                                            <textarea
+                                                name="note"
+                                                id="note"
+                                                rows="15"
+                                                className="rounded-xl"
+                                                value={checkUpData.note}
+                                                onChange={(e) => setCheckUpData('note', e.target.value)}
+                                            ></textarea>
+                                            {checkUpErrors.note && <span className="text-red-500">{checkUpErrors.note}</span>}
+                                        </div>
+                                        <div className="flex flex-col gap-2 flex-basis-[calc(100%-0.5rem)] min-w-[40rem]">
+                                            <label htmlFor="check_up" className="dark:text-gray-100 text-2xl font-bold">Check up</label>
+                                            <textarea
+                                                name="check_up"
+                                                id="check_up"
+                                                rows="15"
+                                                className="rounded-xl"
+                                                value={checkUpData.check_up}
+                                                onChange={(e) => setCheckUpData('check_up', e.target.value)}
+                                            ></textarea>
+                                            {checkUpErrors.check_up && <span className="text-red-500">{checkUpErrors.check_up}</span>}
+                                        </div>
+                                    </div>
+                                </div>
+                                <button
+                                    type="submit"
+                                    className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-lg mt-4 max-w-fit"
+                                    disabled={checkUpProcessing}
+                                >
+                                    {checkUpProcessing ? "Saving..." : "Save"}
+                                </button>
+                            </div>
+                        </form>
+                    </>
                 )}
             </section>
 
