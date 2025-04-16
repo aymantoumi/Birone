@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('check_ups', function (Blueprint $table) {
             $table->id();
             $table->string('check_up')->nullable();
-            $table->foreignId('action_id')->constrained('actions', 'id')->onDelete('cascade');
             $table->timestamps();
         });
     }

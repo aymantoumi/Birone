@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\ActionsType;
 use App\Models\Category;
+use App\Models\check_up;
 use App\Models\LabResult;
 use App\Models\Medication;
 use App\Models\MedicationClass;
 use App\Models\Scanner;
-use Illuminate\Http\Request;
 
 class Settings extends Controller
 {
@@ -21,6 +21,7 @@ class Settings extends Controller
         $lab_results = LabResult::orderBy('created_at', 'desc')->paginate(5);
         $scanners = Scanner::orderBy('created_at', 'desc')->paginate(5);
         $medications = Medication::orderBy('created_at', 'desc')->paginate(5);
+        $check_ups = check_up::orderBy('created_at', 'desc')->paginate(5);
         return inertia('Settings/Index', [
             'actionsType' => $actionsType,
             'categories' => $categories,
@@ -28,6 +29,7 @@ class Settings extends Controller
             'lab_results' => $lab_results,
             'scanners' => $scanners,
             'medications' => $medications,
+            'check_ups' => $check_ups,
         ]);
     }
 }

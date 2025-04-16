@@ -14,16 +14,19 @@ import Scans from './SettingsComponents/Scans';
 import ScannerUpdateDelete from './SettingsComponents/ScannerUpdateDelete';
 import Medication from './SettingsComponents/Medication';
 import MedicationUpdateDelete from './SettingsComponents/MedicationUpdateDelete';
+import CheckUps from './SettingsComponents/CheckUps';
+import CheckUpUpdateDelete from './SettingsComponents/CheckUpsUpdateDelete';
 
-export default function Index({ auth, actionsType, categories, medication_classes, lab_results, scanners, medications }) {
+export default function Index({ auth, actionsType, categories, medication_classes, lab_results, scanners, medications, check_ups }) {
     const [selectedAction, setSelectedAction] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedMedicationClass, setSelectedMedicationClass] = useState(null);
     const [selectedLabResult, setSelectedLabResult] = useState(null);
     const [selectedScanner, setSelectedScanner] = useState(null);
     const [selectedMedication, setSelectedMedication] = useState(null);
+    const [selectedCheckUp, setSelectedCheckUp] = useState(null);
 
-    console.log(medications);
+    console.log(check_ups);
 
 
     const handleActionClick = (action) => {
@@ -44,6 +47,15 @@ export default function Index({ auth, actionsType, categories, medication_classe
 
     const handleMedicationClick = (medication) => {
         setSelectedMedication(medication);
+    };
+
+    const handleCheckUpClick = (check_up) => {
+        setSelectedCheckUp(check_up);
+    };
+
+
+    const closeCheckUpModal = () => {
+        setSelectedCheckUp(null);
     };
 
     const closeActionModal = () => {
@@ -254,9 +266,40 @@ export default function Index({ auth, actionsType, categories, medication_classe
                         </div>
                     </div>
                 </div>
+                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-gray-700 bg-sky-400">
+                    <h1 className="dark:text-amber-950 text-2xl font-extrabold">Check Up</h1>
+                    <div className="flex flex-col gap-5 ">
+                        <CheckUps />
+                        <div className="flex-1 min-w-[8em] min-h-[6em] bg-stone-400 rounded-xl px-6 py-4">
+                            {check_ups && check_ups.data && check_ups.data.length > 0 ? (
+                                check_ups.data.map((check_up) => (
+                                    <div
+                                        key={check_up.id}
+                                        className="bg-white p-4 mb-2 rounded-lg shadow-sm cursor-pointer"
+                                        onClick={() => handleCheckUpClick(check_up)}
+                                    >
+                                        <div>
+                                            <h3 className="font-bold text-lg text-gray-800">{check_up.check_up}</h3>
+                                            <p className="text-sm text-gray-500">
+                                                Created At: {new Date(check_up.created_at).toLocaleString()}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-gray-600 p-4">No medication classes available.</p>
+                            )}
+                            <Pagination links={check_ups.links} />
+                        </div>
+                    </div>
+                </div>
             </section>
-
             {/* Update/Delete Modals */}
+            {selectedCheckUp && (
+                <CheckUpUpdateDelete
+                    check_up={selectedCheckUp}
+                    onClose={closeCheckUpModal}
+                />)}
             {selectedAction && (
                 <ActionUpdateDeleteModal action={selectedAction} onClose={closeActionModal} />
             )}

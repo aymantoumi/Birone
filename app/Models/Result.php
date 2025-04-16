@@ -27,4 +27,9 @@ class Result extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+    
+    public function check_up()
+    {
+        return $this->belongsTo(check_up::class, 'check_up_id');
+    }
 }

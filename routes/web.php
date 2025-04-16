@@ -14,6 +14,7 @@ use App\Http\Controllers\Settings;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\CheckupController;
+use App\Http\Controllers\ResultController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/dashboard');
@@ -28,9 +29,10 @@ Route::middleware(['auth', 'verified', 'administrator:admin'])->group(function (
     Route::resource('medicationClass', MedicationClassController::class);
     Route::resource('lab_results', LabResultController::class);
     Route::resource('scans', ScannerController::class);
+    Route::resource('check_up', CheckupController::class);
     Route::resource('medications', MedicationController::class);
-    Route::post('/Patients/{patient}', [CheckupController::class, 'store'])->name('patients.checkup');
-    Route::put('/checkups/{actionId}', [CheckupController::class, 'update'])->name('checkups.update');
+    Route::post('/Patients/{patient}', [ResultController::class, 'store'])->name('result.store');
+    Route::put('/checkups/{actionId}', [ResultController::class, 'update'])->name('result.update');
 });
 
 Route::middleware(['auth', 'verified',])->group(function () {

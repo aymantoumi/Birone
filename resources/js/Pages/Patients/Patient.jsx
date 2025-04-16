@@ -116,7 +116,7 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
         e.preventDefault();
 
         // Submit the form data using Inertia's post method
-        postCheckUp(route('patients.checkup', { patient: patient.id }), {
+        postCheckUp(route('result.store', { patient: patient.id }), {
             onSuccess: () => {
                 console.log("Check-up data saved successfully!");
             },

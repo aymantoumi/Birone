@@ -119,7 +119,9 @@ class PatientController extends Controller
             ->where('Status', false)
             ->orderBy('created_at', 'desc')
             ->with(['actionType'])
-            ->get();  // Ensure the actionType is loaded
+            ->get(); 
+        
+        $check_ups_record = Action::with(['actionType', ]);
             
         $actionsTypes = ActionsType::all();
         $medications = Medication::all();
