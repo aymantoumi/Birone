@@ -1,5 +1,5 @@
 import PatientsLayout from "@/Layouts/PatientsLayout";
-import { Head, useForm } from "@inertiajs/react";
+import { Head, Link, useForm } from "@inertiajs/react";
 import Pagination from "../Components/Pagination";
 
 export default function Registration({ auth, total_count, waiting, done, actionsWaiting, categories }) {
@@ -55,9 +55,14 @@ export default function Registration({ auth, total_count, waiting, done, actions
                         <div className="gap-3 px-3 py-2 min-h-32 bg-yellow-100 dark:bg-gray-700 rounded-xl flex flex-col 2xl:row-span-2 sm:col-span-1">
                             {actionsWaiting.data.map((action, index) => (
                                 <div key={action.id} className="bg-sky-200 py-3 px-5 font-semibold flex justify-between rounded-lg">
-                                    <div>
-                                        {action.patient ? `${action.patient.first_name} ${action.patient.last_name}` : "Patient Not Found"} - {action.actionType?.action}
-                                    </div>
+                                     <Link
+                                            href={route("Patients.show", action.patient.id)}
+                                            className="block text-black hover:text-black" 
+                                        >
+                                        <div>
+                                            {action.patient ? `${action.patient.first_name} ${action.patient.last_name}` : "Patient Not Found"} - {action.actionType?.action}
+                                        </div>
+                                    </Link>
                                     <div className="bg-green-400 py-1 px-4 rounded-md">
                                         <form action={route('action.changeStatus', { patient: action.id })} method="post">
                                             <input
@@ -95,7 +100,7 @@ export default function Registration({ auth, total_count, waiting, done, actions
                                     name="category_id"
                                     id="category"
                                     className="max-w-96 rounded-lg"
-                                    value={data.category_id} 
+                                    value={data.category_id}
                                     onChange={(e) => setData('category_id', e.target.value)}
                                 >
                                     <option value="" disabled>Select Category</option>

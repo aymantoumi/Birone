@@ -10,7 +10,7 @@ export default function DynamicSelectGroup({
   namePrefix,
 }) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 flex-1">
       <h1 className="dark:text-gray-200 text-xl font-extrabold">{title}</h1>
       <div className="flex flex-col flex-wrap gap-3">
         {values.map((value, index) => (

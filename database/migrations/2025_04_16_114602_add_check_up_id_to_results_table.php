@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::table('results', function (Blueprint $table) {
             $table->foreignId('check_up_id') 
                   ->constrained('check_ups', 'id')
+                  ->after('action_id')
                   ->onDelete('cascade'); 
         });
     }

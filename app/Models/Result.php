@@ -11,7 +11,7 @@ class Result extends Model
 
     protected $table = 'results';
     protected $fillable = [
-        'results',
+        'check_up_id',
         'action_id',
         'created_by',
         'updated_by',

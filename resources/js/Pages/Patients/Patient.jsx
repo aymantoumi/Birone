@@ -5,7 +5,7 @@ import Pagination from "../Components/Pagination";
 import Update from './Update';
 import ChackUpsRecord from "./Components/CheckUpsRecord";
 
-export default function Patient({ auth, patient, actions, pending_actions, actionsTypes, categories, scanners, medications, lab_results }) {
+export default function Patient({ auth, patient, actions, pending_actions, actionsTypes, categories, scanners, medications, lab_results, check_ups, check_ups_record }) {
 
     const { data, setData, put, processing, errors } = useForm({
         first_name: patient.first_name || "",
@@ -30,7 +30,7 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
         labResults: [],
         medications: [],
         note: '',
-        check_up: '',
+        check_up: [],
     });
 
     const [selectedAction, setSelectedAction] = useState(null);
@@ -71,16 +71,16 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
         setSelectedAction(null);
     };
 
-    const [recordStatus, setRecordStatus] = useState(false); 
+    const [recordStatus, setRecordStatus] = useState(false);
 
     // Function to open the modal
     const openRecord = () => {
-        setRecordStatus(true); 
+        setRecordStatus(true);
     };
 
     // Function to close the modal
     const closeRecord = () => {
-        setRecordStatus(false); 
+        setRecordStatus(false);
     };
 
     // Handle changes in dynamic select groups
@@ -266,16 +266,18 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
                 {/* Check-Up Form */}
                 {auth.user.role === 'admin' && (
                     <>
-                        <button 
-                        onClick={openRecord}
-                        className="w-fit dark:bg-cyan-200 bg-cyan-900 py-2 px-5 rounded-xl font-extrabold"
+                        <button
+                            onClick={openRecord}
+                            className="w-fit dark:bg-cyan-200 bg-cyan-900 py-2 px-5 rounded-xl font-extrabold"
                         >
                             Open Record
-                            </button>
+                        </button>
                         <ChackUpsRecord
-                            onClose={closeRecord} 
-                            show={recordStatus} 
-                        />                        <form onSubmit={handleSubmitCheckUp} method="post">
+                            onClose={closeRecord}
+                            show={recordStatus}
+                            data={check_ups_record}
+                        />
+                        <form onSubmit={handleSubmitCheckUp} method="post">
                             <div className="dark:bg-gray-800 bg-sky-100 py-8 px-24 rounded-lg flex flex-col gap-4">
                                 <div className="dark:bg-gray-900 bg-zinc-300 rounded-lg py-4 px-10">
                                     <select
@@ -337,6 +339,24 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
                                             onAdd={() => setCheckUpData('medications', [...checkUpData.medications, ""])}
                                             namePrefix="medications"
                                         />
+                                        <DynamicSelectGroup
+                                            title="Check_up"
+                                            options={(check_ups || []).map(check_up => ({ id: check_up.id, label: check_up.check_up }))}
+                                            values={checkUpData.check_up}
+                                            onChange={(index, value) => {
+                                                const updatedCheck_up = [...checkUpData.check_up];
+                                                updatedCheck_up[index] = value;
+                                                setCheckUpData(prevState => ({
+                                                    ...prevState,
+                                                    check_up: updatedCheck_up,
+                                                }));
+                                            }}
+                                            onAdd={() => setCheckUpData(prevState => ({
+                                                ...prevState,
+                                                check_up: [...prevState.check_up, ""],
+                                            }))}
+                                            namePrefix="check_up"
+                                        />
                                     </div>
                                     <div className="dark:bg-gray-900 bg-zinc-300 py-8 px-24 rounded-lg flex flex-wrap gap-4 justify-between">
                                         <div className="flex flex-col gap-2 flex-basis-[calc(100%-0.5rem)] min-w-[40rem]">
@@ -350,18 +370,6 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
                                                 onChange={(e) => setCheckUpData('note', e.target.value)}
                                             ></textarea>
                                             {checkUpErrors.note && <span className="text-red-500">{checkUpErrors.note}</span>}
-                                        </div>
-                                        <div className="flex flex-col gap-2 flex-basis-[calc(100%-0.5rem)] min-w-[40rem]">
-                                            <label htmlFor="check_up" className="dark:text-gray-100 text-2xl font-bold">Check up</label>
-                                            <textarea
-                                                name="check_up"
-                                                id="check_up"
-                                                rows="15"
-                                                className="rounded-xl"
-                                                value={checkUpData.check_up}
-                                                onChange={(e) => setCheckUpData('check_up', e.target.value)}
-                                            ></textarea>
-                                            {checkUpErrors.check_up && <span className="text-red-500">{checkUpErrors.check_up}</span>}
                                         </div>
                                     </div>
                                 </div>
