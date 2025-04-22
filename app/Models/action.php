@@ -65,4 +65,10 @@ class Action extends Model
     {
         return $this->hasMany(Result::class, 'action_id');
     }
+
+    public function checkUps()
+    {
+        return $this->belongsToMany(check_up::class, 'results', 'action_id', 'check_up_id')
+                    ->withPivot('created_at', 'updated_at'); 
+    }
 }

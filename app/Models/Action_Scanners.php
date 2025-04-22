@@ -18,8 +18,8 @@ class Action_Scanners extends Model
         return $this->belongsTo(Action::class);
     }
 
-    public function scanners()
+    public function scanner()
     {
-        return $this->belongsTo(Scanner::class);
+        return $this->belongsTo(Scanner::class, 'scanner_id'); 
     }
 }

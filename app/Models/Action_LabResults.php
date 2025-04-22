@@ -18,8 +18,8 @@ class Action_LabResults extends Model
         return $this->belongsTo(Action::class);
     }
 
-    public function lab_resultls()
+    public function labResult()
     {
-        return $this->belongsTo(LabResult::class);
+        return $this->belongsTo(LabResult::class, 'lab_result_id');
     }
 }

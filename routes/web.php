@@ -33,6 +33,7 @@ Route::middleware(['auth', 'verified', 'administrator:admin'])->group(function (
     Route::resource('medications', MedicationController::class);
     Route::post('/Patients/{patient}', [ResultController::class, 'store'])->name('result.store');
     Route::put('/checkups/{actionId}', [ResultController::class, 'update'])->name('result.update');
+    Route::get('/results/{action_id}', [ResultController::class, 'show']);
 });
 
 Route::middleware(['auth', 'verified',])->group(function () {

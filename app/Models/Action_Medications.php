@@ -10,13 +10,14 @@ class Action_Medications extends Model
 
     protected $fillable = [
         'action_id',
-        'medication_id'
+        'medication_id',
     ];
 
     public function action()
     {
         return $this->belongsTo(Action::class);
     }
+
     public function medication()
     {
         return $this->belongsTo(Medication::class);

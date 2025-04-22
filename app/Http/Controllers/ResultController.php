@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Action;
 use App\Models\Action_LabResults;
 use App\Models\Action_Medications;
 use Illuminate\Http\Request;
 use App\Models\Action_Scanners;
+use App\Models\check_up;
+use App\Models\LabResult;
+use App\Models\Medication;
 use App\Models\Note;
 use App\Models\Result;
+use App\Models\Scanner;
 
 class ResultController extends Controller
 {
@@ -92,21 +97,45 @@ class ResultController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Result $check_up)
+    public function show($action_id)
     {
-        // Load all relationships
-        $check_up->load([
-            'scans',
-            'labResults',
-            'medications',
-            'checkUps',
-            'actionType',
-            'note',
-            'createdBy'
-        ]);
+        $patient = Action::with([
+            'patient',    
+            'createdBy',  
+            'updatedBy',  
+        ])
+        ->findOrFail($action_id);
 
-        return inertia('CheckUp', [
-            'check_up' => $check_up
+
+        $action_scanners = Action_Scanners::with('scanner')
+        ->where('action_id', $action_id)
+        ->get();
+        $action_medication = Action_Medications::with('medication')
+        ->where('action_id', $action_id)
+        ->get();
+        $action_lab_results = Action_LabResults::with('labResult')
+        ->where('action_id', $action_id)
+        ->get();
+        $action_chesk_ups =  Result::with('check_up')
+        ->where('action_id', $action_id)
+        ->get();
+
+        $medications = Medication::orderBy('medication')->get();
+        $scanners = Scanner::orderBy('scan')->get();
+        $lab_results = LabResult::orderBy('lab_results')->get();
+        $check_ups = check_up::orderBy('check_up')->get();
+
+
+        return inertia('Patients/CheckUp', [
+            'patient' => $patient,
+            'medications' => $medications,
+            'scanners' => $scanners,
+            'lab_results' => $lab_results,
+            'check_ups' => $check_ups,
+            'action_scanners' => $action_scanners,
+            'action_medication' => $action_medication,
+            'action_lab_results' => $action_lab_results,
+            'action_chesk_ups' => $action_chesk_ups,
         ]);
     }
 
