@@ -1,6 +1,8 @@
 import React from "react";
 import PatientsLayout from "@/Layouts/PatientsLayout";
-import { Head, useForm } from "@inertiajs/react";
+import { Head, Link, useForm } from "@inertiajs/react";
+import { useState } from "react";
+import { toast } from "react-toastify";
 
 export default function EditCheckUp({
     auth,
@@ -13,80 +15,129 @@ export default function EditCheckUp({
     action_medication,
     action_lab_results,
     action_chesk_ups,
-    note,
+    note: initialNote,
 }) {
+    const [note, setNote] = useState(initialNote || [{ note: "" }]);
+    console.log();
+
     const {
         data: checkUpData,
         setData: setCheckUpData,
-        post: postCheckUpData,
+        put: putCheckUpData,
         processing: checkUpProcessing,
-        error: checkError,
+        errors: checkErrors,
     } = useForm({
-        action_id: "",
-        // CT Scans
+        _method: "PUT",
+        action_id: patient.id || "",
         deleteScans: [],
         updateScans: [],
         insertScans: [],
-        // Lab Results
         deleteLabResults: [],
         updateLabResults: [],
         insertLabResults: [],
-        // Medications
         deleteMedication: [],
         updateMedication: [],
         insertMedication: [],
-        // Check-ups
         deleteCheckUps: [],
         updateCheckUps: [],
         insertCheckUps: [],
         Notes: "",
     });
 
-    // Handle adding an item to the delete array
+    // Handle marking/unmarking items for deletion
     const handleDeleteItem = (type, id) => {
-        if (type === "medication") {
-            setCheckUpData("deleteMedication", [...checkUpData.deleteMedication, id]);
-        } else if (type === "checkup") {
-            setCheckUpData("deleteCheckUps", [...checkUpData.deleteCheckUps, id]);
-        } else if (type === "scanner") {
-            setCheckUpData("deleteScans", [...checkUpData.deleteScans, id]);
-        } else if (type === "labResult") {
-            setCheckUpData("deleteLabResults", [...checkUpData.deleteLabResults, id]);
+        const typeToKey = {
+            medication: "deleteMedication",
+            checkup: "deleteCheckUps",
+            scanner: "deleteScans",
+            labResult: "deleteLabResults",
+        };
+        const deleteKey = typeToKey[type];
+        if (deleteKey) {
+            setCheckUpData(deleteKey, [...checkUpData[deleteKey], id]);
+        } else {
+            console.error(`Unknown type: ${type}`);
         }
     };
 
     // Handle updating an existing item
     const handleUpdateItem = (type, index, value) => {
-        if (type === "medication") {
-            const updatedMedications = [...checkUpData.updateMedication];
-            updatedMedications[index] = { action_id: action_medication[index].action_id, medication_id: value };
-            setCheckUpData("updateMedication", updatedMedications);
-        } else if (type === "checkup") {
-            const updatedCheckUps = [...checkUpData.updateCheckUps];
-            updatedCheckUps[index] = { action_id: action_chesk_ups[index].action_id, check_up_id: value };
-            setCheckUpData("updateCheckUps", updatedCheckUps);
-        } else if (type === "scanner") {
-            const updatedScans = [...checkUpData.updateScans];
-            updatedScans[index] = { action_id: action_scanners[index].action_id, scanner_id: value };
-            setCheckUpData("updateScans", updatedScans);
-        } else if (type === "labResult") {
-            const updatedLabResults = [...checkUpData.updateLabResults];
-            updatedLabResults[index] = { action_id: action_lab_results[index].action_id, lab_result_id: value };
-            setCheckUpData("updateLabResults", updatedLabResults);
+        const typeToUpdateKey = {
+            medication: "updateMedication",
+            checkup: "updateCheckUps",
+            scanner: "updateScans",
+            labResult: "updateLabResults",
+        };
+        const updateKey = typeToUpdateKey[type];
+        if (updateKey) {
+            const updatedArray = [...checkUpData[updateKey]];
+            updatedArray[index] = { ...updatedArray[index], [`${type}_id`]: value };
+            setCheckUpData(updateKey, updatedArray);
+        } else {
+            console.error(`Unknown type: ${type}`);
         }
     };
 
+    // Handle form submission
+    const handleSubmit = (e) => {
+        e.preventDefault(); // Prevent default form submission
+
+        putCheckUpData(route("results.update", { result: checkUpData.action_id }), {
+            _method: "put",
+            onSuccess: () => {
+                // Show a small toast notification for success
+                toast.success("Check-up updated successfully!", {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
+            },
+            onError: (errors) => {
+                console.error("Form submission errors:", errors);
+
+                // Show an error toast notification
+                toast.error("An error occurred while saving the check-up.", {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
+            },
+        });
+    };
     return (
         <PatientsLayout
             user={auth.user}
             header={
                 <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                    {patient.patient.first_name} {patient.patient.last_name}
+                    <Link
+                        href={route("Patients.show", patient.patient_id)}
+                    >
+                        {patient.patient.first_name} {patient.patient.last_name}
+                    </Link>
                 </h2>
             }
         >
             <section className="flex flex-col px-20 py-10">
-                <form method="post" className="flex flex-col gap-5">
+                <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                    <input
+                        type="hidden"
+                        name="action_id"
+                        value={checkUpData.action_id}
+                        readOnly
+                    />
+                    <input
+                        type="hidden"
+                        name="patient_id"
+                        value={checkUpData.patient_id}
+                        readOnly
+                    />
+                    {/* Main Content */}
                     <div className="dark:bg-gray-800 bg-sky-100 py-8 px-24 rounded-lg flex justify-evenly flex-wrap gap-4">
                         {/* Medications Section */}
                         <Section
@@ -108,8 +159,8 @@ export default function EditCheckUp({
                             onUpdate={(type, index, value) => handleUpdateItem(type, index, value)}
                             type="medication"
                             namePrefix="medication"
+                            checkUpData={checkUpData}
                         />
-
                         {/* Check-ups Section */}
                         <Section
                             title="Check-ups"
@@ -130,8 +181,8 @@ export default function EditCheckUp({
                             onUpdate={(type, index, value) => handleUpdateItem(type, index, value)}
                             type="checkup"
                             namePrefix="check-up"
+                            checkUpData={checkUpData}
                         />
-
                         {/* CT Scans Section */}
                         <Section
                             title="CT Scans"
@@ -152,8 +203,8 @@ export default function EditCheckUp({
                             onUpdate={(type, index, value) => handleUpdateItem(type, index, value)}
                             type="scanner"
                             namePrefix="scanner"
+                            checkUpData={checkUpData}
                         />
-
                         {/* Laboratory Results Section */}
                         <Section
                             title="Lab Results"
@@ -174,31 +225,37 @@ export default function EditCheckUp({
                             onUpdate={(type, index, value) => handleUpdateItem(type, index, value)}
                             type="labResult"
                             namePrefix="lab-result"
+                            checkUpData={checkUpData}
                         />
                     </div>
-
                     {/* Note Section */}
                     <div className="dark:bg-gray-800 bg-zinc-300 py-8 px-24 rounded-lg flex flex-wrap gap-4">
                         <div className="flex flex-col gap-2 flex-basis-[calc(100%-0.5rem)] min-w-[40rem]">
-                            <label htmlFor="note" className="dark:text-gray-100 text-2xl font-bold">Note</label>
+                            <label htmlFor="note" className="dark:text-gray-100 text-2xl font-bold">
+                                Note
+                            </label>
                             {note.map((item, index) => (
                                 <textarea
+                                    key={index}
                                     value={item.note}
                                     name="note"
                                     id="note"
                                     rows="15"
                                     className="rounded-xl"
-                                    key={index}
                                     onChange={(e) => {
                                         const updatedNotes = [...note];
                                         updatedNotes[index].note = e.target.value;
-                                        setCheckUpData("Notes", updatedNotes);
+
+                                        // Flatten the array of notes into a single string
+                                        const flattenedNotes = updatedNotes.map((noteItem) => noteItem.note).join("\n");
+
+                                        // Update the Notes field with the flattened string
+                                        setCheckUpData("Notes", flattenedNotes);
                                     }}
-                                ></textarea>
+                                />
                             ))}
                         </div>
                     </div>
-
                     {/* Save Button */}
                     <button
                         type="submit"
@@ -225,11 +282,11 @@ const Section = ({
     onUpdate,
     type,
     namePrefix,
+    checkUpData,
 }) => {
     return (
-        <div className="flex flex-col gap-4 ">
+        <div className="flex flex-col gap-4">
             <h1 className="text-xl font-extrabold dark:text-gray-200">{title}</h1>
-
             {/* Existing Items */}
             <ul className="list-disc">
                 {existingItems.map((item, index) => (
@@ -246,16 +303,28 @@ const Section = ({
                                 </option>
                             ))}
                         </select>
-                        <button
-                            className="text-red-500 w-fit"
-                            onClick={() => onDelete(item.id)}
-                        >
-                            <i className="fa-solid fa-trash-can"></i>
-                        </button>
+                        <label className="flex items-center gap-1">
+                            <input
+                                type="checkbox"
+                                className="rounded"
+                                checked={checkUpData[`delete${type.charAt(0).toUpperCase() + type.slice(1)}s`]?.includes(
+                                    item.id
+                                )}
+                                onChange={(e) => {
+                                    if (e.target.checked) {
+                                        onDelete(item.id);
+                                    } else {
+                                        onDelete.remove(item.id);
+                                    }
+                                }}
+                            />
+                            <span className="text-red-500">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </span>
+                        </label>
                     </li>
                 ))}
             </ul>
-
             {/* Add New Items */}
             <DynamicSelectGroup
                 title={`Add ${title}`}

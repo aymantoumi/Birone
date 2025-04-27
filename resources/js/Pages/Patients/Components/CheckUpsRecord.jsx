@@ -1,7 +1,9 @@
 import Modal from "@/Components/Modal";
 import Pagination from "@/Pages/Components/Pagination";
+import { Link } from "@inertiajs/react";
 
 export default function ChackUpsRecord({ data, onClose, actionType, show }) {
+    console.log(data);
 
     if (!data || !Array.isArray(data.data)) {
         console.error("Invalid data format: Expected paginated data with 'data' property.");
@@ -28,7 +30,7 @@ export default function ChackUpsRecord({ data, onClose, actionType, show }) {
                     <tbody className="dark:text-black text-white">
                         {data.data.length === 0 ? (
                             <tr>
-                                <td colSpan="6" className="text-center py-4 ">
+                                <td colSpan="6" className="text-center py-4">
                                     No records available
                                 </td>
                             </tr>
@@ -43,24 +45,32 @@ export default function ChackUpsRecord({ data, onClose, actionType, show }) {
                                     <tr
                                         key={index}
                                         className={`font-bold text-base text-center cursor-pointer ${index % 2 === 0
-                                                ? 'dark:bg-stone-200 bg-sky-100'
-                                                : 'dark:bg-slate-300 bg-sky-300'
+                                            ? 'dark:bg-stone-200 bg-sky-100'
+                                            : 'dark:bg-slate-300 bg-sky-300'
                                             } hover:bg-sky-200 transition duration-300`}
                                     >
-                                        <td className="px-4 py-2 border-b border-gray-200">{item.id}</td>
-                                        <td className="px-4 py-2 border-b border-gray-200">
-                                            {item.created_by?.name || 'N/A'}
+                                        {/* Link spans the entire row */}
+                                        <td colSpan="6" className="p-0">
+                                            <Link
+                                                href={
+                                                    item.results && item.results.length > 0
+                                                        ? route('results.show', { result: item.results[0].id })
+                                                        : '#'
+                                                }
+                                                className="block w-full p-4 text-black hover:text-black"
+                                            >
+                                                <div className="flex justify-between">
+                                                    <span>{item.id}</span>
+                                                    <span>{item.created_by?.name || 'N/A'}</span>
+                                                    <span>
+                                                        {item.patient?.first_name} {item.patient?.last_name}
+                                                    </span>
+                                                    <span>{item.action_type?.action || 'N/A'}</span>
+                                                    <span>{item.note ? item.note.note : 'No note available'}</span>
+                                                    <span>{formattedDate}</span>
+                                                </div>
+                                            </Link>
                                         </td>
-                                        <td className="px-4 py-2 border-b border-gray-200">
-                                            {item.patient?.first_name} {item.patient?.last_name}
-                                        </td>
-                                        <td className="px-4 py-2 border-b border-gray-200">
-                                            {item.action_type?.action || 'N/A'}
-                                        </td>
-                                        <td className="px-4 py-2 border-b border-gray-200">
-                                            {item.note ? item.note.note : 'No note available'}
-                                        </td>
-                                        <td className="px-4 py-2 border-b border-gray-200">{formattedDate}</td>
                                     </tr>
                                 );
                             })

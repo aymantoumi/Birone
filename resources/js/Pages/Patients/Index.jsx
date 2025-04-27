@@ -30,7 +30,7 @@ export default function Index({ auth, patients, queryParams = {} }) {
             header={<h2 className="font-semibold text-xl dark:text-gray-200 leading-tight">Patients Management</h2>}
         >
             <Head title="Patients" />
-
+        
             <div className="py-12 max-h-screen flex flex-col items-center mx-12">
                 <div className=" bg-slate-200 dark:bg-gray-800 shadow-lg shadow-sky-200 min-w-full overflow-hidden hover:shadow-2xl transition-all duration-300">
                     <div className="py-8 px-20 flex flex-col">

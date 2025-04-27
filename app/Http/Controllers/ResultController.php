@@ -100,27 +100,27 @@ class ResultController extends Controller
     public function show($action_id)
     {
         $patient = Action::with([
-            'patient',    
-            'createdBy',  
-            'updatedBy',  
+            'patient',
+            'createdBy',
+            'updatedBy',
         ])
-        ->findOrFail($action_id);
+            ->findOrFail($action_id);
 
 
         $action_scanners = Action_Scanners::with('scanner')
-        ->where('action_id', $action_id)
-        ->get();
+            ->where('action_id', $action_id)
+            ->get();
         $action_medication = Action_Medications::with('medication')
-        ->where('action_id', $action_id)
-        ->get();
+            ->where('action_id', $action_id)
+            ->get();
         $action_lab_results = Action_LabResults::with('labResult')
-        ->where('action_id', $action_id)
-        ->get();
+            ->where('action_id', $action_id)
+            ->get();
         $action_chesk_ups =  Result::with('check_up')
-        ->where('action_id', $action_id)
-        ->get();
+            ->where('action_id', $action_id)
+            ->get();
         $note = Note::where('action_id', $action_id)
-        ->get();
+            ->get();
 
         $medications = Medication::orderBy('medication')->get();
         $scanners = Scanner::orderBy('scan')->get();
@@ -153,7 +153,7 @@ class ResultController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Result $result)
+    public function update(Request $request, $action_id)
     {
         // Validate the incoming request data
         $validatedData = $request->validate([
@@ -172,27 +172,27 @@ class ResultController extends Controller
             'insertCheckUps' => 'nullable|array',
             'Notes' => 'nullable|string',
         ]);
-    
+
         $action_id = $validatedData['action_id'];
         $user_id = auth()->id();
-    
+
         // Handle Delete Operations
         if (!empty($validatedData['deleteScans'])) {
             Action_Scanners::whereIn('action_id', $validatedData['deleteScans'])->delete();
         }
-    
+
         if (!empty($validatedData['deleteLabResults'])) {
             Action_LabResults::whereIn('action_id', $validatedData['deleteLabResults'])->delete();
         }
-    
+
         if (!empty($validatedData['deleteMedication'])) {
             Action_Medications::whereIn('action_id', $validatedData['deleteMedication'])->delete();
         }
-    
+
         if (!empty($validatedData['deleteCheckUps'])) {
             Result::whereIn('action_id', $validatedData['deleteCheckUps'])->delete();
         }
-    
+
         // Handle Update Operations
         if (!empty($validatedData['updateScans'])) {
             foreach ($validatedData['updateScans'] as $updateScan) {
@@ -201,7 +201,7 @@ class ResultController extends Controller
                     ->update(['scanner_id' => $updateScan['new_scanner_id']]);
             }
         }
-    
+
         if (!empty($validatedData['updateLabResults'])) {
             foreach ($validatedData['updateLabResults'] as $updateLabResult) {
                 Action_LabResults::where('action_id', $updateLabResult['action_id'])
@@ -209,7 +209,7 @@ class ResultController extends Controller
                     ->update(['lab_result_id' => $updateLabResult['new_lab_result_id']]);
             }
         }
-    
+
         if (!empty($validatedData['updateMedication'])) {
             foreach ($validatedData['updateMedication'] as $updateMedication) {
                 Action_Medications::where('action_id', $updateMedication['action_id'])
@@ -217,7 +217,7 @@ class ResultController extends Controller
                     ->update(['medication_id' => $updateMedication['new_medication_id']]);
             }
         }
-    
+
         if (!empty($validatedData['updateCheckUps'])) {
             foreach ($validatedData['updateCheckUps'] as $updateCheckUp) {
                 Result::where('action_id', $updateCheckUp['action_id'])
@@ -225,7 +225,7 @@ class ResultController extends Controller
                     ->update(['check_up_id' => $updateCheckUp['new_check_up_id']]);
             }
         }
-    
+
         // Handle Insert Operations
         if (!empty($validatedData['insertScans'])) {
             foreach ($validatedData['insertScans'] as $scan_id) {
@@ -235,7 +235,7 @@ class ResultController extends Controller
                 ]);
             }
         }
-    
+
         if (!empty($validatedData['insertLabResults'])) {
             foreach ($validatedData['insertLabResults'] as $lab_result_id) {
                 Action_LabResults::create([
@@ -244,7 +244,7 @@ class ResultController extends Controller
                 ]);
             }
         }
-    
+
         if (!empty($validatedData['insertMedication'])) {
             foreach ($validatedData['insertMedication'] as $medication_id) {
                 Action_Medications::create([
@@ -253,7 +253,7 @@ class ResultController extends Controller
                 ]);
             }
         }
-    
+
         if (!empty($validatedData['insertCheckUps'])) {
             foreach ($validatedData['insertCheckUps'] as $check_up_id) {
                 Result::create([
@@ -263,7 +263,7 @@ class ResultController extends Controller
                 ]);
             }
         }
-    
+
         // Handle Notes
         if (isset($validatedData['Notes'])) {
             Note::updateOrCreate(
@@ -271,9 +271,9 @@ class ResultController extends Controller
                 ['note' => $validatedData['Notes']]
             );
         }
-    
         // Return a success response
-        return to_route('Patients.create')->with('success', 'The check-up was updated successfully.');
+        return ;
+
     }
 
     /**

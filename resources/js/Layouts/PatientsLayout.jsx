@@ -1,5 +1,7 @@
 import NavLink from '@/Components/NavLink';
 import Authenticated from '@/Layouts/AuthenticatedLayout';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function PatientsLayout({ children, user, header }) {
     return (
@@ -14,6 +16,17 @@ export default function PatientsLayout({ children, user, header }) {
                     </NavLink>
                 </div>
                 {children}
+                <ToastContainer
+                    position="top-right" // Position the toast at the top-right corner
+                    autoClose={3000} // Auto-close after 3 seconds
+                    hideProgressBar={false} // Show progress bar
+                    newestOnTop={true} // Show new notifications on top
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                />
             </section>
         </Authenticated>
     );
