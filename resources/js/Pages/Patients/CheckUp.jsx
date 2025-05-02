@@ -17,9 +17,6 @@ export default function EditCheckUp({
     action_chesk_ups,
     note: initialNote,
 }) {
-    const [note, setNote] = useState(initialNote || [{ note: "" }]);
-    console.log();
-
     const {
         data: checkUpData,
         setData: setCheckUpData,
@@ -30,21 +27,20 @@ export default function EditCheckUp({
         _method: "PUT",
         action_id: patient.id || "",
         deleteScans: [],
-        updateScans: [],
+        updateScans: action_scanners.map((item) => ({ scan_id: item.scanner.id })),
         insertScans: [],
         deleteLabResults: [],
-        updateLabResults: [],
+        updateLabResults: action_lab_results.map((item) => ({ lab_result_id: item.lab_result.id })),
         insertLabResults: [],
         deleteMedication: [],
-        updateMedication: [],
+        updateMedication: action_medication.map((item) => ({ medication_id: item.medication.id })),
         insertMedication: [],
         deleteCheckUps: [],
-        updateCheckUps: [],
+        updateCheckUps: action_chesk_ups.map((item) => ({ check_up_id: item.check_up.id })),
         insertCheckUps: [],
-        Notes: "",
+        Notes: initialNote?.map((item) => item.note).join("\n") || "",
     });
 
-    // Handle marking/unmarking items for deletion
     const handleDeleteItem = (type, id) => {
         const typeToKey = {
             medication: "deleteMedication",
@@ -60,7 +56,6 @@ export default function EditCheckUp({
         }
     };
 
-    // Handle updating an existing item
     const handleUpdateItem = (type, index, value) => {
         const typeToUpdateKey = {
             medication: "updateMedication",
@@ -78,9 +73,26 @@ export default function EditCheckUp({
         }
     };
 
+    const handleAddItem = (type) => {
+        const typeToKey = {
+            medication: "insertMedication",
+            checkup: "insertCheckUps",
+            scanner: "insertScans",
+            labResult: "insertLabResults",
+        };
+        const insertKey = typeToKey[type];
+        if (insertKey) {
+            setCheckUpData(insertKey, [...checkUpData[insertKey], ""]);
+        } else {
+            console.error(`Unknown type: ${type}`);
+        }
+    };
+
     // Handle form submission
     const handleSubmit = (e) => {
         e.preventDefault(); // Prevent default form submission
+
+        const formElement = e.target; // Get the form element from the event
 
         putCheckUpData(route("results.update", { result: checkUpData.action_id }), {
             _method: "put",
@@ -94,6 +106,9 @@ export default function EditCheckUp({
                     pauseOnHover: true,
                     draggable: true,
                 });
+
+                // Reset the form fields
+                formElement.reset();
             },
             onError: (errors) => {
                 console.error("Form submission errors:", errors);
@@ -154,14 +169,13 @@ export default function EditCheckUp({
                                 updatedValues[index] = value;
                                 setCheckUpData("insertMedication", updatedValues);
                             }}
-                            onAdd={() => setCheckUpData("insertMedication", [...checkUpData.insertMedication, ""])}
+                            onAdd={() => handleAddItem("medication")}
                             onDelete={(id) => handleDeleteItem("medication", id)}
                             onUpdate={(type, index, value) => handleUpdateItem(type, index, value)}
                             type="medication"
                             namePrefix="medication"
                             checkUpData={checkUpData}
                         />
-                        {/* Check-ups Section */}
                         <Section
                             title="Check-ups"
                             options={(check_ups || []).map((check_up) => ({ id: check_up.id, label: check_up.check_up }))}
@@ -176,7 +190,7 @@ export default function EditCheckUp({
                                 updatedValues[index] = value;
                                 setCheckUpData("insertCheckUps", updatedValues);
                             }}
-                            onAdd={() => setCheckUpData("insertCheckUps", [...checkUpData.insertCheckUps, ""])}
+                            onAdd={() => handleAddItem("checkup")}
                             onDelete={(id) => handleDeleteItem("checkup", id)}
                             onUpdate={(type, index, value) => handleUpdateItem(type, index, value)}
                             type="checkup"
@@ -198,14 +212,13 @@ export default function EditCheckUp({
                                 updatedValues[index] = value;
                                 setCheckUpData("insertScans", updatedValues);
                             }}
-                            onAdd={() => setCheckUpData("insertScans", [...checkUpData.insertScans, ""])}
+                            onAdd={() => handleAddItem("scanner")}
                             onDelete={(id) => handleDeleteItem("scanner", id)}
                             onUpdate={(type, index, value) => handleUpdateItem(type, index, value)}
                             type="scanner"
                             namePrefix="scanner"
                             checkUpData={checkUpData}
                         />
-                        {/* Laboratory Results Section */}
                         <Section
                             title="Lab Results"
                             options={(lab_results || []).map((lab) => ({ id: lab.id, label: lab.lab_results }))}
@@ -220,12 +233,13 @@ export default function EditCheckUp({
                                 updatedValues[index] = value;
                                 setCheckUpData("insertLabResults", updatedValues);
                             }}
-                            onAdd={() => setCheckUpData("insertLabResults", [...checkUpData.insertLabResults, ""])}
+                            onAdd={() => handleAddItem("labResult")}
                             onDelete={(id) => handleDeleteItem("labResult", id)}
                             onUpdate={(type, index, value) => handleUpdateItem(type, index, value)}
                             type="labResult"
                             namePrefix="lab-result"
                             checkUpData={checkUpData}
+                            setCheckUpData={setCheckUpData}
                         />
                     </div>
                     {/* Note Section */}
@@ -234,26 +248,26 @@ export default function EditCheckUp({
                             <label htmlFor="note" className="dark:text-gray-100 text-2xl font-bold">
                                 Note
                             </label>
-                            {note.map((item, index) => (
-                                <textarea
-                                    key={index}
-                                    value={item.note}
-                                    name="note"
-                                    id="note"
-                                    rows="15"
-                                    className="rounded-xl"
-                                    onChange={(e) => {
-                                        const updatedNotes = [...note];
-                                        updatedNotes[index].note = e.target.value;
-
-                                        // Flatten the array of notes into a single string
-                                        const flattenedNotes = updatedNotes.map((noteItem) => noteItem.note).join("\n");
-
-                                        // Update the Notes field with the flattened string
-                                        setCheckUpData("Notes", flattenedNotes);
-                                    }}
-                                />
-                            ))}
+                            {/* Ensure note is initialized properly if empty or undefined */}
+                            {
+                                (checkUpData.Notes ? checkUpData.Notes.split("\n").map((note, index) => ({ note })) : [{ note: "" }])
+                                    .map((item, index) => (
+                                        <textarea
+                                            key={index}
+                                            value={item.note || ""}
+                                            name="note"
+                                            id={`note-${index}`}
+                                            rows="15"
+                                            className="rounded-xl"
+                                            onChange={(e) => {
+                                                const updatedNotes = (checkUpData.Notes ? checkUpData.Notes.split("\n") : [""]).map(
+                                                    (note, idx) => (idx === index ? e.target.value : note)
+                                                );
+                                                setCheckUpData("Notes", updatedNotes.join("\n")); // Update checkUpData.Notes
+                                            }}
+                                        />
+                                    ))
+                            }
                         </div>
                     </div>
                     {/* Save Button */}
@@ -283,6 +297,7 @@ const Section = ({
     type,
     namePrefix,
     checkUpData,
+    setCheckUpData,
 }) => {
     return (
         <div className="flex flex-col gap-4">
@@ -307,19 +322,24 @@ const Section = ({
                             <input
                                 type="checkbox"
                                 className="rounded"
-                                checked={checkUpData[`delete${type.charAt(0).toUpperCase() + type.slice(1)}s`]?.includes(
-                                    item.id
-                                )}
+                                checked={checkUpData[`delete${type.charAt(0).toUpperCase() + type.slice(1)}s`]?.includes(item.id)}
                                 onChange={(e) => {
+                                    const deleteKey = `delete${type.charAt(0).toUpperCase() + type.slice(1)}s`;
+                                    const currentDeletionList = checkUpData[deleteKey] || [];
                                     if (e.target.checked) {
-                                        onDelete(item.id);
+                                        // Add the item ID to the deletion list
+                                        setCheckUpData(deleteKey, [...currentDeletionList, item.id]);
                                     } else {
-                                        onDelete.remove(item.id);
+                                        // Remove the item ID from the deletion list
+                                        setCheckUpData(
+                                            deleteKey,
+                                            currentDeletionList.filter((id) => id !== item.id)
+                                        );
                                     }
                                 }}
                             />
                             <span className="text-red-500">
-                                <i class="fa-solid fa-trash-can"></i>
+                                <i className="fa-solid fa-trash-can"></i>
                             </span>
                         </label>
                     </li>

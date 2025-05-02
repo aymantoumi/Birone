@@ -52,11 +52,7 @@ export default function ChackUpsRecord({ data, onClose, actionType, show }) {
                                         {/* Link spans the entire row */}
                                         <td colSpan="6" className="p-0">
                                             <Link
-                                                href={
-                                                    item.results && item.results.length > 0
-                                                        ? route('results.show', { result: item.results[0].id })
-                                                        : '#'
-                                                }
+                                                href={route('results.show', item.id )}
                                                 className="block w-full p-4 text-black hover:text-black"
                                             >
                                                 <div className="flex justify-between">

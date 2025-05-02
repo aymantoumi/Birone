@@ -128,7 +128,7 @@ class ResultController extends Controller
         $check_ups = check_up::orderBy('check_up')->get();
 
 
-        return inertia('Patients/CheckUp', [
+        return inertia('Result/Index', [
             'patient' => $patient,
             'medications' => $medications,
             'scanners' => $scanners,

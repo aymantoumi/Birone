@@ -1,6 +1,10 @@
 <?php
 
 use App\Http\Controllers\ActionController;
+use App\Http\Controllers\ActionLabResultController;
+use App\Http\Controllers\ActionMedicationController;
+use App\Http\Controllers\ActionResultController;
+use App\Http\Controllers\ActionScannersController;
 use App\Http\Controllers\ActionsTypeController;
 use App\Http\Controllers\categories;
 use App\Http\Controllers\HomeController;
@@ -33,6 +37,10 @@ Route::middleware(['auth', 'verified', 'administrator:admin'])->group(function (
     Route::resource('medications', MedicationController::class);
     Route::post('/Patients/{patient}', [ResultController::class, 'store'])->name('result.store');
     Route::resource('results', ResultController::class);
+    Route::resource('action_medication', ActionMedicationController::class);
+    Route::resource('action_scan', ActionScannersController::class);
+    Route::resource('action_lab_result', ActionLabResultController::class);
+    Route::resource('action_result', ActionResultController::class);
 });
 
 Route::middleware(['auth', 'verified',])->group(function () {
