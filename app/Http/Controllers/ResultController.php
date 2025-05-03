@@ -106,6 +106,7 @@ class ResultController extends Controller
         ])
             ->findOrFail($action_id);
 
+        $resultId = $action_id;
 
         $action_scanners = Action_Scanners::with('scanner')
             ->where('action_id', $action_id)
@@ -138,6 +139,7 @@ class ResultController extends Controller
             'action_medication' => $action_medication,
             'action_lab_results' => $action_lab_results,
             'action_chesk_ups' => $action_chesk_ups,
+            'resultId' => $resultId,
             'note' => $note,
         ]);
     }

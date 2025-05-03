@@ -18,6 +18,7 @@ use App\Http\Controllers\Settings;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\CheckupController;
+use App\Http\Controllers\NoteController;
 use App\Http\Controllers\ResultController;
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +42,7 @@ Route::middleware(['auth', 'verified', 'administrator:admin'])->group(function (
     Route::resource('action_scan', ActionScannersController::class);
     Route::resource('action_lab_result', ActionLabResultController::class);
     Route::resource('action_result', ActionResultController::class);
+    Route::resource('note', NoteController::class);
 });
 
 Route::middleware(['auth', 'verified',])->group(function () {

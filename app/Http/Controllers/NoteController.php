@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Result;
+use App\Models\Note;
 use Illuminate\Http\Request;
 
-class ActionResultController extends Controller
+class NoteController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -53,16 +53,16 @@ class ActionResultController extends Controller
     public function update(Request $request, string $id)
     {
         $validateData = $request->validate([
-            'check_up' => 'required|numeric|exists:check_ups,id'
+            'note' => 'required|string|min:10|max:1024'
+        ]); 
+
+        $note = Note::findOrFail($id);
+
+        $note->update([
+            'note' => $validateData['note']
         ]);
 
-        $action_result = Result::findOrFail($id);
-
-        $action_result->update([
-            'check_up_id' => $validateData['check_up']
-        ]);
-
-        return redirect()->back()->with('success', 'Check up updated successfully');
+        return redirect()->back()->with('sucess', 'updated with sucess') ;
     }
 
     /**
@@ -70,13 +70,6 @@ class ActionResultController extends Controller
      */
     public function destroy(string $id)
     {
-        $action_result = Result::find($id);
-
-        if ($action_result) {
-            $action_result->delete();
-            return ;
-        } else {
-            return back()->with('error', 'Couldn\'t be found');
-        }
+        //
     }
 }

@@ -1,10 +1,12 @@
 import ResultsLayout from "@/Layouts/ResultsLayout";
 import { Head, Link } from "@inertiajs/react";
 import { useState } from "react";
+import { useForm } from "@inertiajs/react";
 import UpdateDeleteMedication from "./Components/UpdateMedications";
 import UpdateDeleteCTScans from "./Components/UpdateCTScans";
 import UpdateLabResults from "./Components/UpdateLabResults";
 import UpdateRuslt from "./Components/UpdateResult";
+import NoteUpdate from "./Components/UpdateNote";
 
 export default function Main
     ({
@@ -28,6 +30,18 @@ export default function Main
     const [showLabResultModal, setShowLabResultModal] = useState(false)
     const [selectedResult, setSelectedResult] = useState(null)
     const [showResultModal, setShowResultModal] = useState(false)
+    const [selectedNote, setSelectedNote] = useState(null);
+    const [showNoteModal, setShowNoteModal] = useState(false);
+
+    const handleEditNote = (item) => {
+        setSelectedNote(item);
+        setShowNoteModal(true);
+    };
+
+    const handleCloseNote = () => {
+        setShowNoteModal(false);
+        setSelectedNote(null);
+    };
 
     const handleEditResult = (item) => {
         setSelectedResult({
@@ -207,58 +221,79 @@ export default function Main
                         </div>
                     </div>
                 </section>
-                <section>
-                    <form method="POST" className="flex flex-col">
-                        <label htmlFor="note" className="dark:text-gray-100 font-extrabold text-2xl">Note</label>
-                        <textarea
-                            name="note"
-                            id="note"
-                            rows="15"
-                            className="rounded-xl"
-                            value={note.note}
-                        >
-                        </textarea>
-                        <button
-                            type="submit"
-                            className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-lg mt-4 max-w-fit"
-                        >
-                            update
-                        </button>
-                    </form>
+                <section className="dark:bg-gray-800 dark:text-gray-100 px-2 py-8 rounded-lg flex flex-col items-start gap-4">
+                    <h1 className="text-3xl font-extrabold">Note</h1>
+                    <div className="text-xl">
+                        {note.length > 0 ? (
+                            note.map((item, index) => (
+                                <div key={index} className="flex flex-col justify-between items-center gap-4">
+                                    <div style={{ whiteSpace: "pre-wrap" }}>
+                                        {item.note}
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleEditNote(item)}
+                                        className="bg-green-600 dark:text-gray-900 hover:text-blue-700 py-2 px-7 w-fit rounded-lg"
+                                        aria-label="Edit note"
+                                    >
+                                        <i className="fa-solid fa-pen-to-square"></i>
+                                    </button>
+                                </div>
+                            ))
+                        ) : (
+                            <p>No notes available.</p>
+                        )}
+                    </div>
                 </section>
             </section>
+            {
+                showNoteModal && selectedNote && (
+                    <NoteUpdate
+                        data={[selectedNote]} 
+                        onClose={handleCloseNote}
+                    />
+                )
+            }
 
-            {showActionMedicationModal && selectedMedication && (
-                <UpdateDeleteMedication
-                    data={selectedMedication}
-                    medication={medications}
-                    onClose={handleCloseMedication}
-                />
-            )}
-            {showActionCTScanModal && selectCTScan && (
-                <UpdateDeleteCTScans
-                    data={selectCTScan}
-                    CTScans={scanners}
-                    onClose={handleCloseCTScans}
-                />
-            )}
+            {
+                showActionMedicationModal && selectedMedication && (
+                    <UpdateDeleteMedication
+                        data={selectedMedication}
+                        medication={medications}
+                        onClose={handleCloseMedication}
+                    />
+                )
+            }
+            {
+                showActionCTScanModal && selectCTScan && (
+                    <UpdateDeleteCTScans
+                        data={selectCTScan}
+                        CTScans={scanners}
+                        onClose={handleCloseCTScans}
+                    />
+                )
+            }
 
-            {showLabResultModal && selectedLabResult && (
-                <UpdateLabResults
-                    data={selectedLabResult}
-                    labResults={lab_results}
-                    onClose={handleCloseLabResult}
-                />
-            )}
+            {
+                showLabResultModal && selectedLabResult && (
+                    <UpdateLabResults
+                        data={selectedLabResult}
+                        labResults={lab_results}
+                        onClose={handleCloseLabResult}
+                    />
+                )
+            }
 
-            {showResultModal && selectedResult && (
-                <UpdateRuslt
-                    data={selectedResult}
-                    check_up={check_ups}
-                    onClose={handleCloseResult}
-                />
-            )}
+            {
+                showResultModal && selectedResult && (
+                    <UpdateRuslt
+                        data={selectedResult}
+                        check_up={check_ups}
+                        onClose={handleCloseResult}
+                    />
+                )
+            }
 
-        </ResultsLayout>
+        </ResultsLayout >
     )
 }
