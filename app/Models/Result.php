@@ -11,7 +11,7 @@ class Result extends Model
 
     protected $table = 'results';
     protected $fillable = [
-        'results',
+        'check_up_id',
         'action_id',
         'created_by',
         'updated_by',
@@ -26,5 +26,10 @@ class Result extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+    
+    public function check_up()
+    {
+        return $this->belongsTo(check_up::class, 'check_up_id');
     }
 }

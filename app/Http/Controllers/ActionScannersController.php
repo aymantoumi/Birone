@@ -9,42 +9,43 @@ class ActionScannersController extends Controller
 {
     public function store(Request $request)
     {
-        // Validate incoming data
-        $validated = $request->validate([
-            'action_id' => 'required|exists:actions,id',
-            'selectedScans' => 'array',
-            'selectedScans.*' => 'nullable|exists:scanners,id',
+        $validatedData = $request->validate([
+            'scanner' => 'required|numeric|exists:scanners,id',
+            'actionId' => 'required|numeric|exists:actions,id'
         ]);
 
-        // Extract validated data
-        $actionId = $validated['action_id'];
-        $selectedScans = $validated['selectedScans'] ?? [];
+        Action_Scanners::create([
+            'scanner_id' => $validatedData['scanner'],
+            'action_id' => $validatedData['actionId'],
+        ]);
 
-        // Retrieve existing records for the given action_id
-        $existingRecords = Action_Scanners::where('action_id', $actionId)->pluck('scanner_id')->toArray();
+        return back()->with('success', 'Scanner added successfully!');
+    }
+    
+    public function update(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'ct_scans' => 'required|numeric|exists:scanners,id',
+        ]);
 
-        // Determine which scanners to create or delete
-        $scannersToAdd = array_diff($selectedScans, $existingRecords);
-        $scannersToRemove = array_diff($existingRecords, $selectedScans);
+        $action_scan = Action_Scanners::findOrFail($id);
 
-        // Create new records for added scanners
-        foreach ($scannersToAdd as $scannerId) {
-            Action_Scanners::create([
-                'action_id' => $actionId,
-                'scanner_id' => $scannerId,
-            ]);
+        $action_scan->update([
+            'scanner_id' => $validated['ct_scans']
+        ]);
+
+        return;
+    }
+
+    public function destroy($id)
+    {
+        $action_scan = Action_Scanners::find($id);
+
+        if ($action_scan) {
+            $action_scan->delete();
+            return redirect()->back();
         }
 
-        // Delete records for removed scanners
-        Action_Scanners::whereIn('scanner_id', $scannersToRemove)
-            ->where('action_id', $actionId)
-            ->delete();
-
-        // Return success response
-        return response()->json([
-            'message' => 'Scanners updated successfully.',
-            'action_id' => $actionId,
-            'scanners' => Action_Scanners::where('action_id', $actionId)->get(),
-        ], 200);
+        return back()->with('error', 'Couldn\'t be found');
     }
 }

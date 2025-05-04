@@ -31,9 +31,14 @@ class Action extends Model
         return $this->belongsTo(ActionsType::class, 'actions_types_id');
     }
 
-    public function user()
+    public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 
     public function medications()
@@ -51,13 +56,19 @@ class Action extends Model
         return $this->belongsToMany(LabResult::class, 'action__lab_results', 'action_id', 'lab_result_id');
     }
 
-    public function result()
+    public function notes()
     {
-        return $this->hasOne(Result::class, 'action_id');
+        return $this->hasMany(Note::class, 'action_id');
     }
 
-    public function note()
+    public function results()
     {
-        return $this->hasOne(Note::class, 'action_id');
+        return $this->hasMany(Result::class, 'action_id');
+    }
+
+    public function checkUps()
+    {
+        return $this->belongsToMany(check_up::class, 'results', 'action_id', 'check_up_id')
+                    ->withPivot('created_at', 'updated_at'); 
     }
 }

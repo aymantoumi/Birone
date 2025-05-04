@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState } from "react";
 import PatientsLayout from "@/Layouts/PatientsLayout";
 import { Head, useForm } from "@inertiajs/react";
 import Pagination from "../Components/Pagination";
 import Update from './Update';
-import CTScans from './Components/CT_scans';
+import ChackUpsRecord from "./Components/CheckUpsRecord";
 
-export default function Patient({ auth, patient, actions, actionsTypes, categories, scanners }) {
+export default function Patient({ auth, patient, actions, pending_actions, actionsTypes, categories, scanners, medications, lab_results, check_ups, check_ups_record }) {
 
     const { data, setData, put, processing, errors } = useForm({
         first_name: patient.first_name || "",
@@ -23,10 +23,15 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
         payment: '',
     });
 
-    const action_id = actions.data[actions.data.length - 1].id
-
-    console.log(actions.data);
-
+    // Use useForm for the Check-Up form
+    const { data: checkUpData, setData: setCheckUpData, post: postCheckUp, processing: checkUpProcessing, errors: checkUpErrors } = useForm({
+        action_id: '',
+        scans: [],
+        labResults: [],
+        medications: [],
+        note: '',
+        check_up: [],
+    });
 
     const [selectedAction, setSelectedAction] = useState(null);
 
@@ -35,10 +40,10 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
     };
 
     const handleActionChange = (field) => (event) => {
-        setActionData({
-            ...actionData,
+        setActionData((prevData) => ({
+            ...prevData,
             [field]: event.target.value,
-        });
+        }));
     };
 
     const submitForm = (e) => {
@@ -51,8 +56,8 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
         postAction(route('patients.actions.store', { patient: patient.id }), {
             onSuccess: () => {
                 setActionData({
-                    Action: '',
-                    Payment: '',
+                    action: '',
+                    payment: '',
                 });
             },
         });
@@ -66,14 +71,61 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
         setSelectedAction(null);
     };
 
-    const [selectedActionId, setSelectedActionId] = useState("");
+    const [recordStatus, setRecordStatus] = useState(false);
 
-    const handleSelectChange = (event) => {
-        const selectedValue = event.target.value; 
-        setSelectedActionId(selectedValue); 
-        console.log("Selected Action ID:", selectedValue); 
+    // Function to open the modal
+    const openRecord = () => {
+        setRecordStatus(true);
     };
-        
+
+    // Function to close the modal
+    const closeRecord = () => {
+        setRecordStatus(false);
+    };
+
+    // Handle changes in dynamic select groups
+    const handleChangeDynamic = (namePrefix, index, value) => {
+        if (namePrefix === "scans") {
+            const updatedScans = [...checkUpData.scans];
+            updatedScans[index] = value;
+            setCheckUpData('scans', updatedScans);
+        } else if (namePrefix === "labResults") {
+            const updatedLabResults = [...checkUpData.labResults];
+            updatedLabResults[index] = value;
+            setCheckUpData('labResults', updatedLabResults);
+        } else if (namePrefix === "medications") {
+            const updatedMedications = [...checkUpData.medications];
+            updatedMedications[index] = value;
+            setCheckUpData('medications', updatedMedications);
+        }
+    };
+
+    // Add new field to dynamic select groups
+    const addNew = (namePrefix) => {
+        if (namePrefix === "scans") {
+            setCheckUpData('scans', [...checkUpData.scans, ""]);
+        } else if (namePrefix === "labResults") {
+            setCheckUpData('labResults', [...checkUpData.labResults, ""]);
+        } else if (namePrefix === "medications") {
+            setCheckUpData('medications', [...checkUpData.medications, ""]);
+        }
+    };
+
+    // Handle Check-Up Form Submission
+    const handleSubmitCheckUp = (e) => {
+        e.preventDefault();
+
+        // Submit the form data using Inertia's post method
+        postCheckUp(route('result.store', { patient: patient.id }), {
+            onSuccess: () => {
+                console.log("Check-up data saved successfully!");
+            },
+            onError: (errors) => {
+                console.error("Validation errors:", errors);
+            },
+        });
+    };
+
     return (
         <PatientsLayout
             user={auth.user}
@@ -85,6 +137,7 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
         >
             <Head title="Patient file" />
             <section className="py-8 px-24 grid gap-3">
+                {/* Patient Details Form */}
                 <div className="dark:bg-gray-800 py-8 px-24 rounded-lg grid 2xl:grid-cols-3 lg:grid-cols-2 grid-cols-1 gap-4">
                     <form
                         className="2xl:col-span-2 bg-sky-600 dark:bg-gray-900 py-5 px-12 rounded-lg"
@@ -144,7 +197,6 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                                 {errors.gender && <span className="text-red-500">{errors.gender}</span>}
                             </div>
                         </div>
-
                         <button
                             type="submit"
                             className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-lg mt-4"
@@ -153,53 +205,52 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                             {processing ? "Updating..." : "Update"}
                         </button>
                     </form>
-                    {/* Actions form  */}
+
+                    {/* Actions Form */}
                     <div className="flex flex-col gap-1 w-full bg-sky-600 dark:bg-gray-900 py-5 px-12 rounded-lg">
                         <form onSubmit={submitActionForm} method="POST" className="grid gap-2">
                             <input type="hidden" name="Patient_ID" value={patient.id} />
                             <div className="flex justify-between gap-2 items-center">
                                 <label htmlFor="action" className="dark:text-stone-200 font-extrabold">Action </label>
                                 <select
-                                    name="Action"
+                                    name="action"
                                     id="action"
                                     className="font-bold rounded-xl w-1/2"
-                                    value={actionData.Action}  // Ensure this matches the selected action id
-                                    onChange={handleActionChange('Action')}
+                                    value={actionData.action}
+                                    onChange={handleActionChange('action')}
                                 >
                                     <option value="" disabled selected>Select visit type</option>
                                     {actionsTypes.map((type, index) => (
                                         <option key={index} value={type.id}>{type.action}</option>
                                     ))}
                                 </select>
-
                                 {actionErrors.Action && <span className="text-red-500">{actionErrors.Action}</span>}
                             </div>
                             <div className="flex justify-between gap-2 items-center">
                                 <label htmlFor="price" className="dark:text-stone-200 font-extrabold">Price</label>
                                 <input
                                     type="number"
-                                    name="Payment"
+                                    name="payment"
                                     id="price"
                                     className="font-bold rounded-xl w-1/2"
-                                    value={actionData.Payment}
-                                    onChange={handleActionChange('Payment')}
+                                    value={actionData.payment}
+                                    onChange={handleActionChange('payment')}
                                 />
                                 {actionErrors.Payment && <span className="text-red-500">{actionErrors.Payment}</span>}
                             </div>
                             <div className="flex justify-evenly">
-                                <button type="reset" className="bg-yellow-300 ax-w-fit py-2 px-6 rounded-xl font-extrabold hover:bg-yellow-400 hover:scale-110 transition-all ">
+                                <button type="reset" className="bg-yellow-300 max-w-fit py-2 px-6 rounded-xl font-extrabold hover:bg-yellow-400 hover:scale-110 transition-all">
                                     Cancel
                                 </button>
-                                <button type="submit" className="dark:bg-emerald-400 dark:text-green-950 max-w-fit py-2 px-6 rounded-xl font-extrabold hover:bg-green-700 hover:scale-110 bg-emerald-400  transition-all" disabled={processing}>
-                                    Add
+                                <button type="submit" className="dark:bg-emerald-400 dark:text-green-950 max-w-fit py-2 px-6 rounded-xl font-extrabold hover:bg-green-700 hover:scale-110 bg-emerald-400 transition-all" disabled={processing}>
+                                    {actionProcessing ? 'Adding...': 'Add'}
                                 </button>
                             </div>
                         </form>
                         {/* Display actions */}
                         {actions.data.map((action, index) => {
                             const formattedDate = new Date(action.created_at).toISOString().split('T')[0];
-                            const actionType = action.action_type?.action || "No action type"; // Fallback to handle missing data
-
+                            const actionType = action.action_type?.action || "No action type";
                             return (
                                 <div key={index} className="flex justify-between min-w-fit bg-emerald-200 py-2 px-4 rounded-md" onClick={() => handleActionClick(action)}>
                                     <span>{action.id}</span>
@@ -208,77 +259,131 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
                                 </div>
                             );
                         })}
-
                         <Pagination links={actions.links} />
                     </div>
                 </div>
+
+                {/* Check-Up Form */}
                 {auth.user.role === 'admin' && (
                     <>
-                        <select
-                            className="rounded-xl w-[16rem]"
-                            name="action_id"
-                            id=""
-                            onChange={handleSelectChange} 
-                            value={selectedActionId} 
+                        <button
+                            onClick={openRecord}
+                            className="w-fit dark:bg-cyan-200 bg-cyan-900 py-2 px-5 rounded-xl font-extrabold"
                         >
-                            <option value="" disabled selected hidden>
-                                Select an action
-                            </option>
-
-                            {actions.data.map((action, index) => {
-                                const formattedDate = new Date(action.created_at).toISOString().split("T")[0];
-                                const actionType = action.action_type?.action || "No action type";
-
-                                return (
-                                    <option
-                                        value={action.id}
-                                        key={index}
+                            Open Record
+                        </button>
+                        <ChackUpsRecord
+                            onClose={closeRecord}
+                            show={recordStatus}
+                            data={check_ups_record}
+                        />
+                        <form onSubmit={handleSubmitCheckUp} method="post">
+                            <div className="dark:bg-gray-800 bg-sky-100 py-8 px-24 rounded-lg flex flex-col gap-4">
+                                <div className="dark:bg-gray-900 bg-zinc-300 rounded-lg py-4 px-10">
+                                    <select
+                                        className="rounded-xl w-[16rem]"
+                                        name="action_id"
+                                        value={checkUpData.action_id}
+                                        onChange={(e) => setCheckUpData('action_id', e.target.value)}
                                     >
-                                        {formattedDate} | {actionType}
-                                    </option>
-                                );
-                            })}
-                        </select>
-                        <div className="dark:bg-gray-800 bg-sky-100 py-8 px-24 rounded-lg grid  lg:grid-cols-2 grid-cols-1 gap-4">
-                            <div className="dark:bg-gray-900 bg-zinc-300 rounded-lg py-4 px-10">
-                                <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
-                                    <h1 className="font-extrabold dark:text-stone-500 text-lg">
-                                        Past Medical Conditions :
-                                    </h1>
-                                    <span className="font-bold dark:text-gray-200"> Patient</span>
+                                        <option value="" disabled selected hidden>
+                                            Select an action
+                                        </option>
+                                        {pending_actions.map((action, index) => {
+                                            const formattedDate = new Date(action.created_at).toISOString().split("T")[0];
+                                            const actionType = action.action_type?.action || "No action type";
+                                            return (
+                                                <option value={action.id} key={index}>
+                                                    {formattedDate} | {actionType}
+                                                </option>
+                                            );
+                                        })}
+                                    </select>
+                                    {checkUpErrors.action_id && <span className="text-red-500">{checkUpErrors.action_id}</span>}
                                 </div>
-                                <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
-                                    <h1 className="font-extrabold dark:text-stone-500 text-lg">
-                                        Past Surgeries :
-                                    </h1>
-                                    <span className="font-bold dark:text-gray-200"> Patient</span>
+                                <div className='grid gap-6'>
+                                    <div className="dark:bg-gray-900 bg-zinc-300 py-8 px-24 rounded-lg flex flex-wrap gap-4 justify-between">
+                                        <DynamicSelectGroup
+                                            title="CT Scans"
+                                            options={scanners.map(scanner => ({ id: scanner.id, label: scanner.scan }))}
+                                            values={checkUpData.scans}
+                                            onChange={(index, value) => {
+                                                const updatedScans = [...checkUpData.scans];
+                                                updatedScans[index] = value;
+                                                setCheckUpData('scans', updatedScans);
+                                            }}
+                                            onAdd={() => setCheckUpData('scans', [...checkUpData.scans, ""])}
+                                            namePrefix="scans"
+                                        />
+                                        <DynamicSelectGroup
+                                            title="Lab Results"
+                                            options={lab_results.map(labResult => ({ id: labResult.id, label: labResult.lab_results }))}
+                                            values={checkUpData.labResults}
+                                            onChange={(index, value) => {
+                                                const updatedLabResults = [...checkUpData.labResults];
+                                                updatedLabResults[index] = value;
+                                                setCheckUpData('labResults', updatedLabResults);
+                                            }}
+                                            onAdd={() => setCheckUpData('labResults', [...checkUpData.labResults, ""])}
+                                            namePrefix="labResults"
+                                        />
+                                        <DynamicSelectGroup
+                                            title="Medication"
+                                            options={medications.map(medication => ({ id: medication.id, label: medication.medication }))}
+                                            values={checkUpData.medications}
+                                            onChange={(index, value) => {
+                                                const updatedMedications = [...checkUpData.medications];
+                                                updatedMedications[index] = value;
+                                                setCheckUpData('medications', updatedMedications);
+                                            }}
+                                            onAdd={() => setCheckUpData('medications', [...checkUpData.medications, ""])}
+                                            namePrefix="medications"
+                                        />
+                                        <DynamicSelectGroup
+                                            title="Check_up"
+                                            options={(check_ups || []).map(check_up => ({ id: check_up.id, label: check_up.check_up }))}
+                                            values={checkUpData.check_up}
+                                            onChange={(index, value) => {
+                                                const updatedCheck_up = [...checkUpData.check_up];
+                                                updatedCheck_up[index] = value;
+                                                setCheckUpData(prevState => ({
+                                                    ...prevState,
+                                                    check_up: updatedCheck_up,
+                                                }));
+                                            }}
+                                            onAdd={() => setCheckUpData(prevState => ({
+                                                ...prevState,
+                                                check_up: [...prevState.check_up, ""],
+                                            }))}
+                                            namePrefix="check_up"
+                                        />
+                                    </div>
+                                    <div className="dark:bg-gray-900 bg-zinc-300 py-8 px-24 rounded-lg flex flex-wrap gap-4 justify-between">
+                                        <div className="flex flex-col gap-2 flex-basis-[calc(100%-0.5rem)] min-w-[40rem]">
+                                            <label htmlFor="note" className="dark:text-gray-100 text-2xl font-bold">Note</label>
+                                            <textarea
+                                                name="note"
+                                                id="note"
+                                                rows="15"
+                                                className="rounded-xl"
+                                                value={checkUpData.note}
+                                                onChange={(e) => setCheckUpData('note', e.target.value)}
+                                            ></textarea>
+                                            {checkUpErrors.note && <span className="text-red-500">{checkUpErrors.note}</span>}
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
-                                    <h1 className="font-extrabold dark:text-stone-500 text-lg">
-                                        Family Medical History  :
-                                    </h1>
-                                    <span className="font-bold dark:text-gray-200"> Patient</span>
-                                </div>
-                                <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
-                                    <h1 className="font-extrabold dark:text-stone-500 text-lg">
-                                        Smoking Status :
-                                    </h1>
-                                    <span className="font-bold dark:text-gray-200"> Patient</span>
-                                </div>
-                                <div className="flex items-center flex-wrap gap-2 min-w-fit justify-between">
-                                    <h1 className="font-extrabold dark:text-stone-500 text-lg">
-                                        Alcohol Consumption :
-                                    </h1>
-                                    <span className="font-bold dark:text-gray-200"> Patient</span>
-                                </div>
+                                <button
+                                    type="submit"
+                                    className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-lg mt-4 max-w-fit"
+                                    disabled={checkUpProcessing}
+                                >
+                                    {checkUpProcessing ? "Saving..." : "Save"}
+                                </button>
                             </div>
-                            <div className="dark:bg-gray-900 bg-zinc-300 py-8 px-24 rounded-lg ">
-                                <CTScans scans={scanners} action_id={selectedActionId} />
-                            </div>
-                        </div>
+                        </form>
                     </>
-                )
-                }
+                )}
             </section>
 
             {/* Update Modal */}
@@ -288,3 +393,39 @@ export default function Patient({ auth, patient, actions, actionsTypes, categori
         </PatientsLayout>
     );
 }
+
+// Dynamic Select Group Component
+const DynamicSelectGroup = ({ title, options, values, onChange, onAdd, namePrefix }) => {
+    return (
+        <div className="flex flex-col gap-4">
+            <h1 className="dark:text-gray-200 text-xl font-extrabold">{title}</h1>
+            <div className="flex flex-col flex-wrap gap-3">
+                {values.map((value, index) => (
+                    <div key={index} className="flex flex-col gap-1">
+                        <select
+                            className="rounded-xl w-[16rem]"
+                            name={`${namePrefix}-${index}`}
+                            id={`${namePrefix}-${index}`}
+                            value={value || ""}
+                            onChange={(e) => onChange(index, e.target.value)}
+                        >
+                            <option value="">Select an option</option>
+                            {options.map((opt) => (
+                                <option key={opt.id} value={opt.id}>
+                                    {opt.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                ))}
+                <button
+                    type="button"
+                    onClick={onAdd}
+                    className="text-green-600 text-2xl"
+                >
+                    <i className="fa-solid fa-circle-plus"></i>
+                </button>
+            </div>
+        </div>
+    );
+};

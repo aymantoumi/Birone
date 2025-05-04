@@ -1,6 +1,11 @@
 <?php
 
+use App\Http\Controllers\ActionCheckupController;
 use App\Http\Controllers\ActionController;
+use App\Http\Controllers\ActionLabResultController;
+use App\Http\Controllers\ActionMedicationController;
+use App\Http\Controllers\ActionResultController;
+use App\Http\Controllers\ActionScannersController;
 use App\Http\Controllers\ActionsTypeController;
 use App\Http\Controllers\categories;
 use App\Http\Controllers\HomeController;
@@ -14,9 +19,9 @@ use App\Http\Controllers\Settings;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\CheckupController;
-use App\Http\Controllers\ActionScannersController;
+use App\Http\Controllers\NoteController;
+use App\Http\Controllers\ResultController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::redirect('/', '/dashboard');
 
@@ -30,10 +35,16 @@ Route::middleware(['auth', 'verified', 'administrator:admin'])->group(function (
     Route::resource('medicationClass', MedicationClassController::class);
     Route::resource('lab_results', LabResultController::class);
     Route::resource('scans', ScannerController::class);
+    Route::resource('check_up', CheckupController::class);
     Route::resource('medications', MedicationController::class);
-    Route::post('/checkups', [CheckupController::class, 'store'])->name('checkups.store');
-    Route::put('/checkups/{actionId}', [CheckupController::class, 'update'])->name('checkups.update');
-    // Route::post('', [ActionScannersController::class, 'store'])->name('scans.store');
+    Route::post('/Patients/{patient}', [ResultController::class, 'store'])->name('result.store');
+    Route::resource('results', ResultController::class);
+    Route::resource('action_checkup', ActionCheckupController::class);
+    Route::resource('action_medication', ActionMedicationController::class);
+    Route::resource('action_scan', ActionScannersController::class);
+    Route::resource('action_lab_result', ActionLabResultController::class);
+    Route::resource('action_result', ActionResultController::class);
+    Route::resource('note', NoteController::class);
 });
 
 Route::middleware(['auth', 'verified',])->group(function () {

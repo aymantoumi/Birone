@@ -7,6 +7,7 @@ use App\Http\Resources\PatientsResource;
 use App\Models\action;
 use App\Models\ActionsType;
 use App\Models\Category;
+use App\Models\check_up;
 use App\Models\LabResult;
 use App\Models\Medication;
 use App\Models\Patient;
@@ -104,6 +105,8 @@ class PatientController extends Controller
      */
     public function show($patientId)
     {
+        $today = date('Y-m-d');
+
         $patient = Patient::findOrFail($patientId);
 
         // Load actions with actionType relationship
@@ -112,11 +115,33 @@ class PatientController extends Controller
             ->with(['actionType'])  // Ensure the actionType is loaded
             ->paginate(5);
 
+        $pending_actions = Action::where('patient_id', $patientId)
+            ->whereDate('created_at', $today)
+            ->where('Status', false)
+            ->orderBy('created_at', 'desc')
+            ->with(['actionType'])
+            ->get(); 
+        
+            $check_ups_record = Action::with([
+                'actionType', 
+                'patient',    
+                'createdBy',  
+                'updatedBy',  
+                'scanners',   
+                'medications',
+                'labResults', 
+                'notes',      
+                'results'     
+            ])
+            ->where('patient_id', $patientId)
+            ->paginate(10);
+            
         $actionsTypes = ActionsType::all();
-        $medications = Medication::all();
+        $medications = Medication::orderBy('medication')->get();
         $categories = Category::all();
-        $scanners = Scanner::all();
-        $lab_results = LabResult::all();
+        $scanners = Scanner::orderBy('scan')->get();
+        $lab_results = LabResult::orderBy('lab_results')->get();
+        $check_ups = check_up::orderBy('check_up')->get();
 
         return Inertia::render('Patients/Patient', [
             'patient' => $patient,
@@ -126,7 +151,9 @@ class PatientController extends Controller
             'medications' => $medications,
             'scanners' => $scanners,
             'lab_results' => $lab_results,
-
+            'pending_actions' => $pending_actions,
+            'check_ups' => $check_ups,
+            'check_ups_record' => $check_ups_record
         ]);
     }
 
