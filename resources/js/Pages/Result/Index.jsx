@@ -7,6 +7,10 @@ import UpdateDeleteCTScans from "./Components/UpdateCTScans";
 import UpdateLabResults from "./Components/UpdateLabResults";
 import UpdateRuslt from "./Components/UpdateResult";
 import NoteUpdate from "./Components/UpdateNote";
+import InsertMedication from "./Components/InsertMedication";
+import InsertLabResult from "./Components/InsertLabResults";
+import InsertScanner from "./Components/InsertCTScans";
+import InsertCheckUpResult from "./Components/InserCheckup";
 
 export default function Main
     ({
@@ -21,6 +25,7 @@ export default function Main
         action_lab_results,
         action_chesk_ups,
         note,
+        resultId,
     }) {
     const [selectedMedication, setSelectedMedication] = useState(null);
     const [showActionMedicationModal, setShowActionMedicationModal] = useState(false);
@@ -32,41 +37,71 @@ export default function Main
     const [showResultModal, setShowResultModal] = useState(false)
     const [selectedNote, setSelectedNote] = useState(null);
     const [showNoteModal, setShowNoteModal] = useState(false);
+    // The insertion modals logic
+    const [showInsertMedication, setShowInsertMedication] = useState(false)
+    const [showInsertCTScans, setShowInsertCTScans] = useState(false)
+    const [showInsertLabResult, setShowInsertLabResult] = useState(false)
+    const [showInsertCheckup, setShowInsertCheckup] = useState(false)
 
-    const handleEditNote = (item) => {
+    const handelInserCheckup = () => {
+        setShowInsertCheckup(true)
+    }
+    const handelCloseInsertCheckup = () => {
+        setShowInsertCheckup(false)
+    }
+    const handelInserMedication = () => {
+        setShowInsertMedication(true)
+    }
+    const handelCloseInsertMedication = () => {
+        setShowInsertMedication(false)
+    }
+    const handelInserCTScans = () => {
+        setShowInsertCTScans(true)
+    }
+    const handelCloseInserCTScans = () => {
+        setShowInsertCTScans(false)
+    }
+    const handelInserLabResult = () => {
+        setShowInsertLabResult(true)
+    }
+    const handelCloseInserLabResult = () => {
+        setShowInsertLabResult(false)
+    }
+
+    const handelEditNote = (item) => {
         setSelectedNote(item);
         setShowNoteModal(true);
     };
 
-    const handleCloseNote = () => {
+    const handelCloseNote = () => {
         setShowNoteModal(false);
         setSelectedNote(null);
     };
 
-    const handleEditResult = (item) => {
+    const handelEditResult = (item) => {
         setSelectedResult({
             id: item.id,
             check_up_id: item.check_up_id
         });
         setShowResultModal(true)
     }
-    const handleCloseResult = () => {
+    const handelCloseResult = () => {
         setShowResultModal(false)
         setSelectedResult(null)
     }
 
-    const handleEditLabResult = (item) => {
+    const handelEditLabResult = (item) => {
         setSelectedLabResult({
             id: item.id,
             lab_result_id: item.lab_result_id
         });
         setShowLabResultModal(true)
     }
-    const handleCloseLabResult = () => {
+    const handelCloseLabResult = () => {
         setShowLabResultModal(false)
         selectedLabResult(null)
     }
-    const handleEditMedicationClick = (item) => {
+    const handelEditMedicationClick = (item) => {
         setSelectedMedication({
             id: item.id,
             medication_id: item.medication_id
@@ -74,12 +109,12 @@ export default function Main
         setShowActionMedicationModal(true);
     }
 
-    const handleCloseMedication = () => {
+    const handelCloseMedication = () => {
         setShowActionMedicationModal(false);
         setSelectedMedication(null);
     }
 
-    const handlEditActionCTScans = (item) => {
+    const handelditActionCTScans = (item) => {
         setSelectedCTscan({
             id: item.id,
             scanner_id: item.scanner_id
@@ -87,7 +122,7 @@ export default function Main
         setShowActionCTScanModal(true)
     }
 
-    const handleCloseCTScans = () => {
+    const handelCloseCTScans = () => {
         setShowActionCTScanModal(false)
         setSelectedCTscan(null)
     }
@@ -119,7 +154,7 @@ export default function Main
                         <span className="text-2xl font-bold">
                             Medications
                         </span>
-                        <div className="px-4 text-lg">
+                        <div className="flex flex-col gap-3 px-4 text-lg">
                             <ul className=" list-item list-disc">
                                 {
                                     action_medication.map((item, index) => (
@@ -130,7 +165,7 @@ export default function Main
                                                 </span>
                                                 <button
                                                     type="button"
-                                                    onClick={() => handleEditMedicationClick(item)}
+                                                    onClick={() => handelEditMedicationClick(item)}
                                                     className="hover:text-blue-700"
                                                 >
                                                     <i className="fa-solid fa-pen-to-square"></i>
@@ -140,6 +175,10 @@ export default function Main
                                     ))
                                 }
                             </ul>
+                            <button
+                                onClick={() => handelInserMedication()}
+                                className="bg-green-600 rounded-xl px-6 py-2 dark:text-gray-950 text-xl w-fit"
+                            ><i class="fa-solid fa-plus"></i></button>
                         </div>
                     </div>
 
@@ -158,7 +197,7 @@ export default function Main
                                                 </span>
                                                 <button
                                                     type="button"
-                                                    onClick={() => handlEditActionCTScans(item)}
+                                                    onClick={() => handelditActionCTScans(item)}
                                                     className="hover:text-blue-700"
                                                 ><i class="fa-solid fa-pen-to-square"></i></button>
                                             </div>
@@ -166,6 +205,10 @@ export default function Main
                                     ))
                                 }
                             </ul>
+                            <button
+                                onClick={() => handelInserCTScans()}
+                                className="bg-green-600 rounded-xl px-6 py-2 dark:text-gray-950 text-xl w-fit"
+                            ><i class="fa-solid fa-plus"></i></button>
                         </div>
                     </div>
 
@@ -184,7 +227,7 @@ export default function Main
                                                 </span>
                                                 <button
                                                     type="button"
-                                                    onClick={() => handleEditLabResult(item)}
+                                                    onClick={() => handelEditLabResult(item)}
                                                     className="hover:text-blue-700"
                                                 ><i class="fa-solid fa-pen-to-square"></i></button>
                                             </div>
@@ -192,6 +235,10 @@ export default function Main
                                     ))
                                 }
                             </ul>
+                            <button
+                                onClick={() => handelInserLabResult()}
+                                className="bg-green-600 rounded-xl px-6 py-2 dark:text-gray-950 text-xl w-fit"
+                            ><i class="fa-solid fa-plus"></i></button>
                         </div>
                     </div>
 
@@ -210,7 +257,7 @@ export default function Main
                                                 </span>
                                                 <button
                                                     type="button"
-                                                    onClick={() => handleEditResult(item)}
+                                                    onClick={() => handelEditResult(item)}
                                                     className="hover:text-blue-700"
                                                 ><i class="fa-solid fa-pen-to-square"></i></button>
                                             </div>
@@ -218,10 +265,14 @@ export default function Main
                                     ))
                                 }
                             </ul>
+                            <button
+                                onClick={() => handelInserCheckup()}
+                                className="bg-green-600 rounded-xl px-6 py-2 dark:text-gray-950 text-xl w-fit"
+                            ><i class="fa-solid fa-plus"></i></button>
                         </div>
                     </div>
                 </section>
-                <section className="dark:bg-gray-800 dark:text-gray-100 px-2 py-8 rounded-lg flex flex-col items-start gap-4">
+                <section className="dark:bg-gray-800 dark:text-gray-100 px-12 py-8 rounded-lg flex flex-col items-start gap-4">
                     <h1 className="text-3xl font-extrabold">Note</h1>
                     <div className="text-xl">
                         {note.length > 0 ? (
@@ -232,7 +283,7 @@ export default function Main
                                     </div>
                                     <button
                                         type="button"
-                                        onClick={() => handleEditNote(item)}
+                                        onClick={() => handelEditNote(item)}
                                         className="bg-green-600 dark:text-gray-900 hover:text-blue-700 py-2 px-7 w-fit rounded-lg"
                                         aria-label="Edit note"
                                     >
@@ -246,11 +297,50 @@ export default function Main
                     </div>
                 </section>
             </section>
+            {/* Inser Modals */}
+            {
+                showInsertMedication && (
+                    <InsertMedication
+                        data={medications}
+                        actionId={resultId}
+                        onClose={handelCloseInsertMedication}
+                    />
+                )
+            }
+            {
+                showInsertLabResult && (
+                    <InsertLabResult
+                        actionId={resultId}
+                        data={lab_results}
+                        onClose={handelCloseInserLabResult}
+                    />
+                )
+            }
+            {
+                showInsertCTScans && (
+                    <InsertScanner
+                        actionId={resultId}
+                        data={scanners}
+                        onClose={handelCloseInserCTScans}
+                    />
+                )
+            }
+            {
+                showInsertCheckup && (
+                    <InsertCheckUpResult
+                        actionId={resultId}
+                        data={check_ups}
+                        onClose={handelCloseInsertCheckup}
+                    />
+                )
+            }
+
+            {/* UpdateModals */}
             {
                 showNoteModal && selectedNote && (
                     <NoteUpdate
-                        data={[selectedNote]} 
-                        onClose={handleCloseNote}
+                        data={[selectedNote]}
+                        onClose={handelCloseNote}
                     />
                 )
             }
@@ -260,7 +350,7 @@ export default function Main
                     <UpdateDeleteMedication
                         data={selectedMedication}
                         medication={medications}
-                        onClose={handleCloseMedication}
+                        onClose={handelCloseMedication}
                     />
                 )
             }
@@ -269,7 +359,7 @@ export default function Main
                     <UpdateDeleteCTScans
                         data={selectCTScan}
                         CTScans={scanners}
-                        onClose={handleCloseCTScans}
+                        onClose={handelCloseCTScans}
                     />
                 )
             }
@@ -279,7 +369,7 @@ export default function Main
                     <UpdateLabResults
                         data={selectedLabResult}
                         labResults={lab_results}
-                        onClose={handleCloseLabResult}
+                        onClose={handelCloseLabResult}
                     />
                 )
             }
@@ -289,7 +379,7 @@ export default function Main
                     <UpdateRuslt
                         data={selectedResult}
                         check_up={check_ups}
-                        onClose={handleCloseResult}
+                        onClose={handelCloseResult}
                     />
                 )
             }

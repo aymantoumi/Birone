@@ -28,7 +28,17 @@ class ActionLabResultController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'lab_result' => 'required|numeric|exists:lab_results,id',
+            'actionId' => 'required|numeric|exists:actions,id'
+        ]);
+    
+        Action_LabResults::create([
+            'lab_result_id' => $validatedData['lab_result'],
+            'action_id' => $validatedData['actionId'],
+        ]);
+    
+        return back()->with('success', 'Lab result added successfully!');
     }
 
     /**

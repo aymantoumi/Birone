@@ -7,6 +7,21 @@ use Illuminate\Http\Request;
 
 class ActionScannersController extends Controller
 {
+    public function store(Request $request)
+    {
+        $validatedData = $request->validate([
+            'scanner' => 'required|numeric|exists:scanners,id',
+            'actionId' => 'required|numeric|exists:actions,id'
+        ]);
+
+        Action_Scanners::create([
+            'scanner_id' => $validatedData['scanner'],
+            'action_id' => $validatedData['actionId'],
+        ]);
+
+        return back()->with('success', 'Scanner added successfully!');
+    }
+    
     public function update(Request $request, string $id)
     {
         $validated = $request->validate([
@@ -28,7 +43,7 @@ class ActionScannersController extends Controller
 
         if ($action_scan) {
             $action_scan->delete();
-            return redirect()->back(); 
+            return redirect()->back();
         }
 
         return back()->with('error', 'Couldn\'t be found');

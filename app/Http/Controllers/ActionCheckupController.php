@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Action_Medications;
+use App\Models\Result;
 use Illuminate\Http\Request;
 
-class ActionMedicationController extends Controller
+class ActionCheckupController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -29,16 +29,19 @@ class ActionMedicationController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'medication' => 'required|numeric|exists:medications,id',
+            'check_up' => 'required|numeric|exists:check_ups,id',
             'actionId' => 'required|numeric|exists:actions,id'
         ]);
+        $user_id = auth()->id();
 
-        Action_Medications::create([
-            'medication_id' => $validatedData['medication'],
+        Result::create([
+            'check_up_id' => $validatedData['check_up'],
             'action_id' => $validatedData['actionId'],
+            'created_by' => $user_id,
+            'updated_by' => $user_id,
         ]);
-
-        return back()->with('success', 'Medication added successfully!');
+    
+        return back()->with('success', 'Check-up result added successfully!');
     }
 
     /**
@@ -62,31 +65,14 @@ class ActionMedicationController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $validatedData = $request->validate([
-            'medication' => 'required|numeric|exists:medications,id'
-        ]);
-
-        $action_medication = Action_Medications::findOrFail($id);
-        
-        $action_medication->update([
-            'medication_id' => $validatedData['medication']
-        ]);
-
-        return redirect()->back()->with('success', 'Medication updated successfully');
+        //
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(string $id)
     {
-        $action_medication = Action_Medications::find($id);
-
-        if ($action_medication) {
-            $action_medication->delete();
-            return;
-        } else {
-            return back()->with('error', 'Couldn\'t be found');
-        }
+        //
     }
 }

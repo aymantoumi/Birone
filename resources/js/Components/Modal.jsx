@@ -37,7 +37,7 @@ export default function Modal({ children, show = false, closeable = true, onClos
                     leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                 >
                     <DialogPanel
-                        className="relative w-3/4 h-full sm:h-auto sm:max-h-screen bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-xl transform transition-all mx-auto"
+                        className="relative w-2/5 h-full sm:h-auto sm:max-h-screen bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-xl transform transition-all mx-auto"
                     >
                         {children}
                     </DialogPanel>

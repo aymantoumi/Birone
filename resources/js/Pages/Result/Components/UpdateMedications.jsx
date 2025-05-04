@@ -68,7 +68,7 @@ export default function UpdateDeleteMedication({ data, medication, onClose, onDe
                             type="button" 
                             onClick={handelDelete}
                             className="bg-red-500 text-white py-2 px-6 rounded-xl font-extrabold hover:bg-red-700 hover:scale-110 transition-all"
-                            disabled={proccesing}
+                            disabled={processing}
                         >
                             Delete
                         </button>
@@ -76,7 +76,7 @@ export default function UpdateDeleteMedication({ data, medication, onClose, onDe
                         <button 
                             type="submit" 
                             className="dark:bg-green-400 dark:text-green-950 max-w-fit py-2 px-6 rounded-xl font-extrabold hover:bg-green-700 hover:scale-110 bg-green-900 text-green-200 transition-all"
-                            disabled={proccesing}
+                            disabled={processing}
                         >
                             Update
                         </button>
