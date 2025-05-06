@@ -99,6 +99,25 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
             setCheckUpData('medications', updatedMedications);
         }
     };
+    const removeItemDynamic = (namePrefix, index) => {
+        if (namePrefix === "scans") {
+            const updatedScans = [...checkUpData.scans];
+            updatedScans.splice(index, 1);
+            setCheckUpData('scans', updatedScans);
+        } else if (namePrefix === "labResults") {
+            const updatedLabResults = [...checkUpData.labResults];
+            updatedLabResults.splice(index, 1);
+            setCheckUpData('labResults', updatedLabResults);
+        } else if (namePrefix === "medications") {
+            const updatedMedications = [...checkUpData.medications];
+            updatedMedications.splice(index, 1);
+            setCheckUpData('medications', updatedMedications);
+        } else if (namePrefix === "check_up") {
+            const updatedCheckUps = [...checkUpData.check_up];
+            updatedCheckUps.splice(index, 1);
+            setCheckUpData('check_up', updatedCheckUps);
+        }
+    };
 
     // Add new field to dynamic select groups
     const addNew = (namePrefix) => {
@@ -313,6 +332,7 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
                                                 setCheckUpData('scans', updatedScans);
                                             }}
                                             onAdd={() => setCheckUpData('scans', [...checkUpData.scans, ""])}
+                                            onRemove={(index) => removeItemDynamic('scans', index)}
                                             namePrefix="scans"
                                         />
                                         <DynamicSelectGroup
@@ -325,6 +345,7 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
                                                 setCheckUpData('labResults', updatedLabResults);
                                             }}
                                             onAdd={() => setCheckUpData('labResults', [...checkUpData.labResults, ""])}
+                                            onRemove={(index) => removeItemDynamic('labResults', index)}
                                             namePrefix="labResults"
                                         />
                                         <DynamicSelectGroup
@@ -337,6 +358,7 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
                                                 setCheckUpData('medications', updatedMedications);
                                             }}
                                             onAdd={() => setCheckUpData('medications', [...checkUpData.medications, ""])}
+                                            onRemove={(index) => removeItemDynamic('medications', index)}
                                             namePrefix="medications"
                                         />
                                         <DynamicSelectGroup
@@ -355,6 +377,7 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
                                                 ...prevState,
                                                 check_up: [...prevState.check_up, ""],
                                             }))}
+                                            onRemove={(index) => removeItemDynamic('Check_up', index)}
                                             namePrefix="check_up"
                                         />
                                     </div>
@@ -395,13 +418,21 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
 }
 
 // Dynamic Select Group Component
-const DynamicSelectGroup = ({ title, options, values, onChange, onAdd, namePrefix }) => {
+const DynamicSelectGroup = ({ 
+    title, 
+    options, 
+    values, 
+    onChange, 
+    onAdd, 
+    onRemove, 
+    namePrefix 
+}) => {
     return (
         <div className="flex flex-col gap-4">
             <h1 className="dark:text-gray-200 text-xl font-extrabold">{title}</h1>
             <div className="flex flex-col flex-wrap gap-3">
                 {values.map((value, index) => (
-                    <div key={index} className="flex flex-col gap-1">
+                    <div key={index} className="flex items-center gap-2">
                         <select
                             className="rounded-xl w-[16rem]"
                             name={`${namePrefix}-${index}`}
@@ -416,12 +447,21 @@ const DynamicSelectGroup = ({ title, options, values, onChange, onAdd, namePrefi
                                 </option>
                             ))}
                         </select>
+                        {/* Remove Button */}
+                        <button
+                            type="button"
+                            onClick={() => onRemove(index)}
+                            className="text-red-500 hover:text-red-700 text-xl"
+                            // disabled={values.length <= 1} 
+                        >
+                            <i className="fa-solid fa-circle-minus"></i>
+                        </button>
                     </div>
                 ))}
                 <button
                     type="button"
                     onClick={onAdd}
-                    className="text-green-600 text-2xl"
+                    className="text-green-600 hover:text-green-800 text-2xl"
                 >
                     <i className="fa-solid fa-circle-plus"></i>
                 </button>
