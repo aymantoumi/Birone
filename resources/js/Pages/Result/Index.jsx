@@ -147,7 +147,7 @@ export default function Main
                 className="px-24 py-8 flex flex-col gap-8"
             >
                 <section
-                    className="dark:bg-gray-800 rounded-lg px-4 py-2 flex flex-wrap justify-between "
+                    className="dark:bg-gray-800 bg-sky-700 rounded-lg px-4 py-2 flex flex-wrap justify-between "
                 >
 
                     <div className="dark:text-gray-100 py-2 px-6 min-w-[16rem]">
@@ -272,7 +272,7 @@ export default function Main
                         </div>
                     </div>
                 </section>
-                <section className="dark:bg-gray-800 dark:text-gray-100 px-12 py-8 rounded-lg flex flex-col items-start gap-4">
+                <section className="dark:bg-gray-800 bg-sky-700 dark:text-gray-100 px-12 py-8 rounded-lg flex flex-col items-start gap-4">
                     <h1 className="text-3xl font-extrabold">Note</h1>
                     <div className="text-xl">
                         {note.length > 0 ? (

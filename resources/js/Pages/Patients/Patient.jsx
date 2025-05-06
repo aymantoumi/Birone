@@ -157,9 +157,9 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
             <Head title="Patient file" />
             <section className="py-8 px-24 grid gap-3">
                 {/* Patient Details Form */}
-                <div className="dark:bg-gray-800 py-8 px-24 rounded-lg grid 2xl:grid-cols-3 lg:grid-cols-2 grid-cols-1 gap-4">
+                <div className="dark:bg-gray-800 bg-sky-400 py-8 px-24 rounded-lg grid 2xl:grid-cols-3 lg:grid-cols-2 grid-cols-1 gap-4">
                     <form
-                        className="2xl:col-span-2 bg-sky-600 dark:bg-gray-900 py-5 px-12 rounded-lg"
+                        className="2xl:col-span-2 bg-sky-700 dark:bg-gray-900 py-5 px-12 rounded-lg"
                         onSubmit={submitForm}
                         method="POST"
                     >
@@ -226,7 +226,7 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
                     </form>
 
                     {/* Actions Form */}
-                    <div className="flex flex-col gap-1 w-full bg-sky-600 dark:bg-gray-900 py-5 px-12 rounded-lg">
+                    <div className="flex flex-col gap-1 w-full bg-sky-700 dark:bg-gray-900 py-5 px-12 rounded-lg">
                         <form onSubmit={submitActionForm} method="POST" className="grid gap-2">
                             <input type="hidden" name="Patient_ID" value={patient.id} />
                             <div className="flex justify-between gap-2 items-center">
@@ -287,7 +287,7 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
                     <>
                         <button
                             onClick={openRecord}
-                            className="w-fit dark:bg-cyan-200 bg-cyan-900 py-2 px-5 rounded-xl font-extrabold"
+                            className="w-fit dark:bg-cyan-200 bg-cyan-900 text-gray-50 py-2 px-5 rounded-xl font-extrabold"
                         >
                             Open Record
                         </button>
@@ -297,8 +297,8 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
                             data={check_ups_record}
                         />
                         <form onSubmit={handleSubmitCheckUp} method="post">
-                            <div className="dark:bg-gray-800 bg-sky-100 py-8 px-24 rounded-lg flex flex-col gap-4">
-                                <div className="dark:bg-gray-900 bg-zinc-300 rounded-lg py-4 px-10">
+                            <div className="dark:bg-gray-800 bg-sky-400 py-8 px-24 rounded-lg flex flex-col gap-4">
+                                <div className="dark:bg-gray-900 bg-sky-700 rounded-lg py-4 px-10">
                                     <select
                                         className="rounded-xl w-[16rem]"
                                         name="action_id"
@@ -321,7 +321,7 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
                                     {checkUpErrors.action_id && <span className="text-red-500">{checkUpErrors.action_id}</span>}
                                 </div>
                                 <div className='grid gap-6'>
-                                    <div className="dark:bg-gray-900 bg-zinc-300 py-8 px-24 rounded-lg flex flex-wrap gap-4 justify-between">
+                                    <div className="dark:bg-gray-900 bg-sky-700 py-8 px-24 rounded-lg flex flex-wrap gap-4 justify-between">
                                         <DynamicSelectGroup
                                             title="CT Scans"
                                             options={scanners.map(scanner => ({ id: scanner.id, label: scanner.scan }))}
@@ -381,7 +381,7 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
                                             namePrefix="check_up"
                                         />
                                     </div>
-                                    <div className="dark:bg-gray-900 bg-zinc-300 py-8 px-24 rounded-lg flex flex-wrap gap-4 justify-between">
+                                    <div className="dark:bg-gray-900 bg-sky-700 py-8 px-24 rounded-lg flex flex-wrap gap-4 justify-between">
                                         <div className="flex flex-col gap-2 flex-basis-[calc(100%-0.5rem)] min-w-[40rem]">
                                             <label htmlFor="note" className="dark:text-gray-100 text-2xl font-bold">Note</label>
                                             <textarea
@@ -398,7 +398,7 @@ export default function Patient({ auth, patient, actions, pending_actions, actio
                                 </div>
                                 <button
                                     type="submit"
-                                    className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-lg mt-4 max-w-fit"
+                                    className="bg-green-600 hover:bg-green-700 font-extrabold py-2 px-4 rounded-lg mt-4 max-w-fit"
                                     disabled={checkUpProcessing}
                                 >
                                     {checkUpProcessing ? "Saving..." : "Save"}

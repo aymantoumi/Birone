@@ -26,9 +26,6 @@ export default function Index({ auth, actionsType, categories, medication_classe
     const [selectedMedication, setSelectedMedication] = useState(null);
     const [selectedCheckUp, setSelectedCheckUp] = useState(null);
 
-    console.log(check_ups);
-
-
     const handleActionClick = (action) => {
         setSelectedAction(action);
     };
@@ -94,11 +91,11 @@ export default function Index({ auth, actionsType, categories, medication_classe
             <Head title="Settings" />
             <section className="py-8 px-12 flex flex-wrap gap-4">
                 {/* Actions management */}
-                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-gray-700 bg-sky-400">
-                    <h1 className="dark:text-amber-950 text-2xl font-extrabold">Actions Management</h1>
+                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-gray-700 bg-sky-300">
+                    <h1 className="text-2xl font-extrabold">Actions Management</h1>
                     <div className="flex flex-col gap-5">
                         <ActionsForm />
-                        <div className="flex-1 min-w-[8em] min-h-[6em] bg-stone-400 rounded-xl px-6 py-4">
+                        <div className="flex-1 min-w-[8em] min-h-[6em] bg-sky-700 rounded-xl px-6 py-4">
                             {actionsType && actionsType.data && actionsType.data.length > 0 ? (
                                 actionsType.data.map((action) => (
                                     <div
@@ -123,11 +120,11 @@ export default function Index({ auth, actionsType, categories, medication_classe
                 </div>
 
                 {/* Categories */}
-                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-gray-700 bg-sky-400">
-                    <h1 className="dark:text-amber-950 text-2xl font-extrabold">Categories Management</h1>
+                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:text-amber-950  bg-sky-300 ">
+                    <h1 className="text-2xl font-extrabold">Categories Management</h1>
                     <div className="flex flex-col gap-5 ">
                         <Categories />
-                        <div className="flex-1 min-w-[8em] min-h-[6em] bg-stone-400 rounded-xl px-6 py-4">
+                        <div className="flex-1 min-w-[8em] min-h-[6em] bg-sky-700 rounded-xl px-6 py-4">
                             {categories && categories.data && categories.data.length > 0 ? (
                                 categories.data.map((category) => (
                                     <div
@@ -152,11 +149,11 @@ export default function Index({ auth, actionsType, categories, medication_classe
                 </div>
 
                 {/* Lab Results */}
-                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-gray-700 bg-sky-400">
-                    <h1 className="dark:text-amber-950 text-2xl font-extrabold">Lab Results</h1>
+                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-gray-700 bg-sky-300 ">
+                    <h1 className="text-2xl font-extrabold">Lab Results</h1>
                     <div className="flex flex-col gap-5">
                         <LabResults />
-                        <div className="flex-1 min-w-[8em] min-h-[6em] bg-stone-400 rounded-xl px-6 py-4">
+                        <div className="flex-1 min-w-[8em] min-h-[6em] bg-sky-700 rounded-xl px-6 py-4">
                             {lab_results?.data?.length > 0 ? (
                                 lab_results.data.map((lab_result) => (
                                     <div
@@ -181,11 +178,11 @@ export default function Index({ auth, actionsType, categories, medication_classe
                 </div>
 
                 {/* Medication Class */}
-                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-gray-700 bg-sky-400">
-                    <h1 className="dark:text-amber-950 text-2xl font-extrabold">Medication Class</h1>
+                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:text-amber-950  bg-sky-300 ">
+                    <h1 className="text-2xl font-extrabold">Medication Class</h1>
                     <div className="flex flex-col gap-5 ">
                         <MedicationClasses />
-                        <div className="flex-1 min-w-[8em] min-h-[6em] bg-stone-400 rounded-xl px-6 py-4">
+                        <div className="flex-1 min-w-[8em] min-h-[6em] bg-sky-700 rounded-xl px-6 py-4">
                             {medication_classes && medication_classes.data && medication_classes.data.length > 0 ? (
                                 medication_classes.data.map((medication_class) => (
                                     <div
@@ -210,11 +207,11 @@ export default function Index({ auth, actionsType, categories, medication_classe
                 </div>
 
                 {/* Medication Form */}
-                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-gray-700 bg-sky-400">
-                    <h1 className="dark:text-amber-950 text-2xl font-extrabold">Add Medication</h1>
+                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:text-amber-950  bg-sky-300 ">
+                    <h1 className="text-2xl font-extrabold">Add Medication</h1>
                     <div className="flex flex-col gap-5 ">
                         <Medication medicationClass={medication_classes} />
-                        <div className="flex-1 min-w-[8em] min-h-[6em] bg-stone-400 rounded-xl px-6 py-4">
+                        <div className="flex-1 min-w-[8em] min-h-[6em] bg-sky-700 rounded-xl px-6 py-4">
                             {medications && medications.data && medications.data.length > 0 ? (
                                 medications.data.map((medication) => (
                                     <div
@@ -239,11 +236,11 @@ export default function Index({ auth, actionsType, categories, medication_classe
                     </div>
                 </div>
 
-                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-gray-700 bg-sky-400">
-                    <h1 className="dark:text-amber-950 text-2xl font-extrabold">Scans</h1>
+                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:text-amber-950  bg-sky-300 ">
+                    <h1 className="text-2xl font-extrabold">Scans</h1>
                     <div className="flex flex-col gap-5 ">
                         <Scans />
-                        <div className="flex-1 min-w-[8em] min-h-[6em] bg-stone-400 rounded-xl px-6 py-4">
+                        <div className="flex-1 min-w-[8em] min-h-[6em] bg-sky-700 rounded-xl px-6 py-4">
                             {scanners && scanners.data && scanners.data.length > 0 ? (
                                 scanners.data.map((scanner) => (
                                     <div
@@ -266,11 +263,11 @@ export default function Index({ auth, actionsType, categories, medication_classe
                         </div>
                     </div>
                 </div>
-                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:bg-gray-700 bg-sky-400">
-                    <h1 className="dark:text-amber-950 text-2xl font-extrabold">Check Up</h1>
+                <div className="bg-cadetblue min-w-[25em] min-h-[6em] p-8 rounded-3xl flex-1 dark:text-amber-950  bg-sky-300 ">
+                    <h1 className="text-2xl font-extrabold">Check Up</h1>
                     <div className="flex flex-col gap-5 ">
                         <CheckUps />
-                        <div className="flex-1 min-w-[8em] min-h-[6em] bg-stone-400 rounded-xl px-6 py-4">
+                        <div className="flex-1 min-w-[8em] min-h-[6em] bg-sky-700 rounded-xl px-6 py-4">
                             {check_ups && check_ups.data && check_ups.data.length > 0 ? (
                                 check_ups.data.map((check_up) => (
                                     <div

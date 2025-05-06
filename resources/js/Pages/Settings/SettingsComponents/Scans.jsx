@@ -16,7 +16,7 @@ export default function Scans() {
         <form
             onSubmit={submitForm}
             method="post"
-            className="flex flex-col flex-1 gap-4 min-w-[8em] min-h-[6em] px-8 py-4 bg-stone-400 rounded-xl"
+            className="flex flex-col flex-1 gap-4 min-w-[8em] min-h-[6em] px-8 py-4 bg-sky-700 rounded-xl"
         >
             <label htmlFor="scan">Scan name </label> 
             <input

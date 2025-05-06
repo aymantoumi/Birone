@@ -1,17 +1,15 @@
-import Modal from "@/Components/Modal";
+import RecordsModal from "@/Components/RecordsModal";
 import Pagination from "@/Pages/Components/Pagination";
 import { Link } from "@inertiajs/react";
 
 export default function ChackUpsRecord({ data, onClose, actionType, show }) {
-    console.log(data);
-
     if (!data || !Array.isArray(data.data)) {
         console.error("Invalid data format: Expected paginated data with 'data' property.");
         return <div className="text-red-500">Invalid data format</div>;
     }
 
     return (
-        <Modal show={show} onClose={onClose}>
+        <RecordsModal show={show} onClose={onClose}>
             <div className="dark:bg-gray-800 py-6 px-20 rounded-lg overflow-hidden">
                 <table className="text-sm text-left w-full">
                     {/* Table Header */}
@@ -76,6 +74,6 @@ export default function ChackUpsRecord({ data, onClose, actionType, show }) {
                 {/* Pagination Component */}
                 <Pagination links={data.links} />
             </div>
-        </Modal>
+        </RecordsModal>
     );
 }

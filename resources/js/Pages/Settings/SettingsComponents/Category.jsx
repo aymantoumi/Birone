@@ -12,7 +12,7 @@ export default function Categories()
         })
     }
     return (
-        <form onSubmit={submitForm} method="post" className="flex flex-col flex-1 gap-4 min-w-[8em] min-h-[6em] px-8 py-4 bg-stone-400 rounded-xl">
+        <form onSubmit={submitForm} method="post" className="flex flex-col flex-1 gap-4 min-w-[8em] min-h-[6em] px-8 py-4 bg-sky-700 rounded-xl">
         <label htmlFor="category" className=" font-extrabold">Category</label>
         <input 
             type="text" 
